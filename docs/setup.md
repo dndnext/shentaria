@@ -2,9 +2,9 @@
 
 ## Requirements
 
-* Node 8+
-* Yarn 1.9+
-* TBC DB
+- Node 8+
+- Yarn 1.9+
+- TBC DB
 
 ## Installation
 
@@ -14,5 +14,12 @@
 
 ## Running
 
+### Next.js App
+
 1. `yarn dev`
+2. :boom:
+
+### Server
+
+1. `yarn server`
 2. :boom:
