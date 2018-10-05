@@ -11,7 +11,7 @@ declare module "react" {
 
 export default class extends React.Component {
   public state = {
-    render: false
+    render: false,
   };
 
   public componentDidMount() {
