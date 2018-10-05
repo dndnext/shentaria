@@ -9,7 +9,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "lint": "tslint './{app, pages}/**/*.{ts,tsx}' -t verbose",
+    "lint": "tslint './{app,pages}/**/*.{ts,tsx}' -t verbose",
     "test": "echo 'No tests'"
   },
   "husky": {
