@@ -9,8 +9,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "lint": "tslint './{app, pages}/**/*.{ts,tsx}' -t verbose",
-    "precommit": "pretty-quick --staged && yarn lint"
+    "lint": "tslint './{app, pages}/**/*.{ts,tsx}' -t verbose"
   },
   "dependencies": {
     "koa": "^2.5.3",
@@ -29,5 +28,10 @@
     "tslint": "^5.11.0",
     "tslint-react": "^3.6.0",
     "typescript": "^3.1.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged && yarn lint"
+    }
   }
 }
