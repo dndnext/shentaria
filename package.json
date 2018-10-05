@@ -1,0 +1,17 @@
+{
+  "name": "shentaria",
+  "version": "1.0.0",
+  "description": "A google maps like mapping tool for dnd worlds",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^7.0.1",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  }
+}
