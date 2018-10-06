@@ -87,20 +87,20 @@ export default class extends React.Component {
     function indexX(inX: number) {
       const i = inX * 4;
       if (i > details.data.length) {
-        console.warn("X out of bounds"); //tslint:disable-line
+        console.warn("X out of bounds");
       }
       return i;
     }
     function indexY(inY: number) {
       const i = details.w * 4 * inY;
       if (i > details.data.length) {
-        console.warn("Y out of bounds"); //tslint:disable-line
+        console.warn("Y out of bounds");
       }
       return i;
     }
     const idx = indexX(x) + indexY(y);
     if (idx > details.data.length) {
-      console.warn("XY out of bounds"); //tslint:disable-line
+      console.warn("XY out of bounds");
     }
     return idx;
   }
