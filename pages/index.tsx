@@ -1,59 +1,141 @@
-import Head from "next/head";
-import React from "react";
-import NoSSR from "react-no-ssr";
+import React, { ChangeEvent } from "react";
 
-declare module "react" {
-  interface StyleHTMLAttributes<T> {
-    jsx?: boolean;
-    global?: boolean;
-  }
+interface ImageDetails {
+  h: number;
+  w: number;
+  tilesX: number;
+  tilesY: number;
+  data: Uint8ClampedArray;
+}
+
+interface Tile {
+  data: ImageData;
+  x: number;
+  y: number;
 }
 
 export default class extends React.Component {
   public state = {
     render: false,
+    tileDimension: 100,
   };
+
+  private reader?: FileReader;
+  private ctx?: CanvasRenderingContext2D;
+  private img?: HTMLImageElement;
 
   public componentDidMount() {
     this.setState({ render: true });
+    this.reader = new FileReader();
+    const canvas = document.getElementById("tiles") as HTMLCanvasElement;
+    canvas.width = 500;
+    canvas.height = 500;
+    this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    this.img = new Image();
   }
 
   public render() {
-    const { render } = this.state;
-    let Map, TileLayer;
-    if (render) {
-      const { Map: map, TileLayer: tilelayer } = require("react-leaflet");
-      Map = map;
-      TileLayer = tilelayer;
-    }
-
-    return render ? (
+    return (
       <div>
-        <Head>
-          <link
-            rel="stylesheet"
-            href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
-            integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-            crossOrigin=""
-          />
-        </Head>
-        <style jsx global>{`
-          body {
-            padding: 0;
-            margin: 0;
-          }
-        `}</style>
-        <NoSSR>
-          <Map center={[51.505, -0.09]} zoom={13} style={{ height: "100vh" }}>
-            <TileLayer
-              attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </Map>
-        </NoSSR>
+        <input type="file" onChange={this.handleFile} />
+        <canvas id="tiles" />
       </div>
-    ) : (
-      <span>Map Placeholder</span>
     );
   }
+
+  private handleFile = (e: ChangeEvent) => {
+    const { tileDimension } = this.state;
+    if (!(e.target as any).files) {
+      return;
+    }
+    const reader = this.reader!;
+    const img = this.img!;
+    const ctx = this.ctx!;
+    reader.readAsDataURL((e.target as any).files[0]);
+    reader.onload = () => {
+      img.src = reader.result as string;
+      img.onload = () => {
+        const details: ImageDetails = {
+          data: new Uint8ClampedArray(),
+          h: img.height,
+          tilesX: Math.floor(img.width / tileDimension),
+          tilesY: Math.floor(img.height / tileDimension),
+          w: img.width,
+        };
+        ctx.drawImage(img, 0, 0);
+        details.data = ctx.getImageData(0, 0, details.w, details.h).data;
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        const tiles = this.generateTiles(details);
+        this.drawTiles(tiles);
+      };
+    };
+  };
+
+  private generateTiles = (details: ImageDetails) => {
+    console.log("generating", details); //tslint:disable-line
+    const getTile = this.getTileGenerator(details);
+    const tiles = [];
+    for (let yi = 0; yi < details.tilesY; yi++) {
+      for (let xi = 0; xi < details.tilesX; xi++) {
+        tiles.push(getTile(xi, yi));
+      }
+    }
+    return tiles;
+  };
+
+  private getIndex(details: ImageDetails, x: number, y: number) {
+    function indexX(inX: number) {
+      const i = inX * 4;
+      if (i > details.data.length) {
+        console.warn("X out of bounds"); //tslint:disable-line
+      }
+      return i;
+    }
+    function indexY(inY: number) {
+      const i = details.w * 4 * inY;
+      if (i > details.data.length) {
+        console.warn("Y out of bounds"); //tslint:disable-line
+      }
+      return i;
+    }
+    const idx = indexX(x) + indexY(y);
+    if (idx > details.data.length) {
+      console.warn("XY out of bounds"); //tslint:disable-line
+    }
+    return idx;
+  }
+
+  private getTileGenerator = (details: ImageDetails) => {
+    const { tileDimension } = this.state;
+    return (inputX: number, inputY: number) => {
+      const x = inputX * tileDimension;
+      const y = inputY * tileDimension;
+      const tileData = [];
+      for (let i = 0; i < tileDimension; i++) {
+        tileData.push(
+          ...details.data.slice(
+            this.getIndex(details, x, y + i),
+            this.getIndex(details, x + tileDimension, y + i),
+          ),
+        );
+      }
+      const tile: Tile = {
+        data: new ImageData(
+          new Uint8ClampedArray(tileData),
+          tileDimension,
+          tileDimension,
+        ),
+        x,
+        y,
+      };
+      return tile;
+    };
+  };
+
+  private drawTiles = (tiles: Tile[]) => {
+    const offset = 1.1;
+    console.log(tiles); //tslint:disable-line
+    const ctx = this.ctx!;
+    tiles.forEach(d => ctx.putImageData(d.data, d.x * offset, d.y * offset));
+  };
 }
