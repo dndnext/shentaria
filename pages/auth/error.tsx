@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import presetForCss from "./presetForCss";
 
 export default class extends React.Component<
   { type: string; action: string },
@@ -16,8 +17,8 @@ export default class extends React.Component<
   public render() {
     if (this.props.action === "signin" && this.props.type === "oauth") {
       return (
-        <div>
-          <div>
+        <div className={presetForCss.flexParent}>
+          <div className={presetForCss.block}>
             <h1>Unable to sign in</h1>
             <p>An account associated with your email address already exists.</p>
             <p>
@@ -26,8 +27,8 @@ export default class extends React.Component<
               </Link>
             </p>
           </div>
-          <div>
-            <div>
+          <div className={presetForCss.flexParent}>
+            <div className={presetForCss.block}>
               <div>
                 <h4>Why am I seeing this?</h4>
                 <p>
