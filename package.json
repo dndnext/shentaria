@@ -9,7 +9,9 @@
     "build": "next build",
     "start": "NODE_ENV=production node server",
     "lint": "tslint './{app,pages}/**/*.{ts,tsx}' -t verbose",
-    "test": "echo 'No tests'"
+    "test": "echo 'No tests'",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "husky": {
     "hooks": {
@@ -42,8 +44,12 @@
     "next-env": "^1.0.1",
     "prettier": "^1.14.3",
     "pretty-quick": "^1.7.0",
+    "storybook": "^1.0.0",
     "tslint": "^5.11.0",
     "tslint-react": "^3.6.0",
-    "typescript": "^3.1.1"
+    "typescript": "^3.1.1",
+    "@storybook/react": "^3.4.11",
+    "@storybook/addon-actions": "^3.4.11",
+    "@storybook/addon-links": "^3.4.11"
   }
 }
