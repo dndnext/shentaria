@@ -4,6 +4,7 @@ import { NextAuth } from "next-auth/client";
 import Link from "next/link";
 import Router from "next/router";
 import React from "react";
+import presetForCss from "./presetForCss";
 
 export default class extends React.Component<
   { session: any },
@@ -65,26 +66,26 @@ export default class extends React.Component<
       return null;
     } else {
       return (
-        <div>
+        <div className={presetForCss.flexParent}>
           <div>
-            <h1>NextAuth With Credentials</h1>
+            <h1 className={presetForCss.heading1}>NextAuth With Credentials</h1>
           </div>
           <div>
-            <div>
-              <p>
+            <div className={presetForCss.flexParent}>
+              <p className={presetForCss.block}>
                 If you need password based sign in, two factor authentication or
                 another sign in method, you can use a signin() function in{" "}
                 <strong>next-auth.functions.js</strong>.
               </p>
-              <p>
+              <p className={presetForCss.block}>
                 You can pass in any properties you need – e.g. username and
                 password, a PIN or 2FA Token – as properties of the object
                 passed to NextAuth.signin() in the front end and they will be
                 passed through to your signin() function.
               </p>
-              <div>
-                <h4>Sign In</h4>
-                <div>
+              <div className={presetForCss.flexParent}>
+                <h4 className={presetForCss.heading1}>Sign In</h4>
+                <div className={presetForCss.block}>
                   <p>
                     <strong>Important!</strong> Enable the signin() function in{" "}
                     <strong>next-auth.functions.js</strong> first.

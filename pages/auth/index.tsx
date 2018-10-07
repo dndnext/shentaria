@@ -6,6 +6,7 @@ import Link from "next/link";
 import Router from "next/router";
 import React from "react";
 import LinkAccounts from "./link-accounts";
+import presetForCss from "./presetForCss";
 import SignInButtons from "./signin-buttons";
 
 export default class extends React.Component<
@@ -58,7 +59,7 @@ export default class extends React.Component<
     });
     if (this.props.session.user) {
       return (
-        <div>
+        <div className={presetForCss.flexParent}>
           <div>
             <h1 className={example}>NextAuth Example</h1>
             <p>
@@ -82,7 +83,7 @@ export default class extends React.Component<
       );
     } else {
       return (
-        <div>
+        <div className={presetForCss.flexParent}>
           <div>
             <h1 className={example}>NextAuth Example</h1>
           </div>
