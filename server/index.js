@@ -1,11 +1,17 @@
-// server here, not sure if to integrate with next.js or standalone
+require("dotenv-extended").load();
 
-const Koa = require("koa");
-const app = new Koa();
+const next = require("next");
+const nextAuth = require("next-auth");
+const nextAuthConfig = require("./next-auth.config");
 
-// response
-app.use(ctx => {
-  ctx.body = "Hello Koa";
+const nextApp = next({
+  dir: ".",
+  dev: process.env.NODE_ENV === "development",
 });
 
-app.listen(3042);
+nextApp
+  .prepare()
+  .then(() => nextAuthConfig())
+  .then(nextAuthOptions => nextAuth(nextApp, nextAuthOptions))
+  .then(response => console.log(`${process.env.SERVER_URL}`))
+  .catch(err => console.error("Error starting server", err));
