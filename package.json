@@ -19,9 +19,6 @@
     }
   },
   "dependencies": {
-    "@babel/core": "^7.1.2",
-    "babel-core": "^7.0.0-bridge",
-    "babel-loader": "^8.0.4",
     "connect-mongo": "^2.0.1",
     "dotenv-extended": "^2.3.0",
     "emotion": "^9.2.12",
