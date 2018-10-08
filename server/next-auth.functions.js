@@ -12,6 +12,7 @@ module.exports = () => {
     if (process.env.MONGO_URI) {
       MongoClient.connect(
         process.env.MONGO_URI,
+        { useNewUrlParser: true },
         (err, mongoClient) => {
           if (err) return reject(err);
           const dbName = process.env.MONGO_URI.split("/")
