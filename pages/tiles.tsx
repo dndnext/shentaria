@@ -1,5 +1,8 @@
-import { saveAs } from "file-saver";
+// import { saveAs } from "file-saver";
 import JSZip from "jszip";
+// @ts-ignore
+import { NextAuth } from "next-auth/client";
+// @ts-ignore
 import React, { ChangeEvent } from "react";
 
 interface ImageDetails {
@@ -27,6 +30,13 @@ export default class extends React.Component {
   private tileCtx?: CanvasRenderingContext2D;
   private img?: HTMLImageElement;
   private tiles: Tile[] = [];
+  private details: ImageDetails = {
+    data: new Uint8ClampedArray(),
+    h: 0,
+    tilesX: 0,
+    tilesY: 0,
+    w: 0,
+  };
 
   public componentDidMount() {
     this.setState({ render: true });
@@ -49,6 +59,7 @@ export default class extends React.Component {
       <div>
         <input type="file" onChange={this.handleFile} />
         <button onClick={this.download}>Download</button>
+        <button onClick={this.upload}>Upload</button>
         <input
           disabled
           type="range"
@@ -100,6 +111,7 @@ export default class extends React.Component {
         ctx.canvas.width = details.w;
         ctx.drawImage(img, 0, 0);
         details.data = ctx.getImageData(0, 0, details.w, details.h).data;
+        this.details = details;
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         const tiles = this.generateTiles(details);
         this.drawTiles(tiles);
@@ -191,5 +203,35 @@ export default class extends React.Component {
     images.forEach((img, i) => zip.file(`tile-${i}.png`, img as any));
     const content = await zip.generateAsync({ type: "blob" });
     saveAs(content, "tiles.zip");
+  };
+
+  private upload = async () => {
+    const tileCtx = this.tileCtx!;
+    const images = await Promise.all(
+      this.tiles.map(
+        d =>
+          new Promise(resolve => {
+            tileCtx.putImageData(d.data, 0, 0);
+            tileCtx.canvas.toBlob(blob => resolve(blob as any));
+          }),
+      ),
+    );
+    const form = new FormData();
+    const { tilesX, tilesY } = this.details;
+    const getXY = (i: number) => `${i % tilesX}-${Math.round(i / tilesY)}`;
+    images.forEach((img, i) =>
+      form.append("tiles", img as any, `tile-${getXY(i)}.png`),
+    );
+    const token = await NextAuth.csrfToken();
+    fetch("/api/upload/test/1", {
+      body: form,
+      credentials: "same-origin",
+      headers: new Headers({
+        "x-csrf-token": token,
+      }),
+      method: "POST",
+    }).then(res => {
+      console.info(res.ok);
+    });
   };
 }
