@@ -15,11 +15,12 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const { mapName, z } = req.params;
     const [_, x, y] = file.originalname.split(".")[0].split("-");
-    const dir = `static/tiles/${mapName}/${z}/${y}/${x}`;
+    const dir = `static/tiles/${mapName}/${z}/${x}`;
     mkdir(dir).then(madeDir => cb(null, madeDir), cb);
   },
   filename: (req, file, cb) => {
-    cb(null, "tile.png");
+    const [_, x, y] = file.originalname.split(".")[0].split("-");
+    cb(null, `${y}.png`);
   },
 });
 const upload = multer({ storage });

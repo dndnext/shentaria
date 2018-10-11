@@ -1,4 +1,5 @@
 import React from "react";
+import CsrfToken from "../../app/components/atoms/CsrfToken";
 
 export default class LinkAccount extends React.Component<{
   linked: boolean;
@@ -12,11 +13,7 @@ export default class LinkAccount extends React.Component<{
           method="post"
           action={`/auth/oauth/${this.props.provider.toLowerCase()}/unlink`}
         >
-          <input
-            name="_csrf"
-            type="hidden"
-            value={this.props.session.csrfToken}
-          />
+          <CsrfToken />
           <p>
             <button type="submit">Unlink from {this.props.provider}</button>
           </p>

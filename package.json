@@ -19,6 +19,7 @@
     }
   },
   "dependencies": {
+    "antd": "^3.10.0",
     "connect-mongo": "^2.0.1",
     "cors": "^2.8.4",
     "dotenv-extended": "^2.3.0",

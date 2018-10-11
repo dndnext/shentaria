@@ -5,8 +5,11 @@ import { NextAuth } from "next-auth/client";
 import Link from "next/link";
 import Router from "next/router";
 import React from "react";
+import Authed from "../../app/components/atoms/Authed";
+import NotAuthed from "../../app/components/atoms/NotAuthed";
+import SignInButtons from "../../app/components/atoms/SignInButtons";
+import StateContainer from "../../app/components/templates/StateContainer";
 import LinkAccounts from "./link-accounts";
-import SignInButtons from "./signin-buttons";
 
 export default class extends React.Component<
   { session: any; linkedAccounts: any; providers: any },
@@ -56,87 +59,64 @@ export default class extends React.Component<
     const example = css({
       color: "red",
     });
-    if (this.props.session.user) {
-      return (
-        <div>
-          <div>
-            <h1 className={example}>NextAuth Example</h1>
-            <p>
-              You are signed in as <span>{this.props.session.user.email}</span>.
-            </p>
-          </div>
-          <div>
-            <div>
-              <LinkAccounts
-                session={this.props.session}
-                linkedAccounts={this.props.linkedAccounts}
-              />
-            </div>
-          </div>
-          <p>
-            <Link href="/">
-              <a>Home</a>
-            </Link>
-          </p>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <div>
-            <h1 className={example}>NextAuth Example</h1>
-          </div>
-          <div>
-            <div>
+    return (
+      <StateContainer
+        session={this.props.session}
+        linkedAccounts={this.props.linkedAccounts}
+        providers={this.props.providers}
+      >
+        <React.Fragment>
+          <Authed>
+            {({ session, linkedAccounts }) => (
               <div>
-                <h4>Sign In</h4>
                 <div>
-                  <SignInButtons providers={this.props.providers} />
-                  <form
-                    id="signin"
-                    method="post"
-                    action="/auth/email/signin"
-                    onSubmit={this.handleSignInSubmit}
-                  >
-                    <input
-                      name="_csrf"
-                      type="hidden"
-                      value={this.state.session.csrfToken}
-                    />
-                    <p>
-                      <label htmlFor="email">Email address</label>
-                      <br />
-                      <input
-                        name="email"
-                        type="text"
-                        placeholder="j.smith@example.com"
-                        id="email"
-                        value={this.state.email}
-                        onChange={this.handleEmailChange}
-                      />
-                    </p>
-                    <p className="text-right">
-                      <button id="submitButton" type="submit">
-                        Sign in with email
-                      </button>
-                    </p>
-                  </form>
+                  <h1 className={example}>NextAuth Example</h1>
+                  <p>
+                    You are signed in as <span>{session.user.email}</span>.
+                  </p>
                 </div>
+                <div>
+                  <div>
+                    <LinkAccounts
+                      session={session}
+                      linkedAccounts={linkedAccounts}
+                    />
+                  </div>
+                </div>
+                <p>
+                  <Link href="/">
+                    <a>Home</a>
+                  </Link>
+                </p>
               </div>
-            </div>
-          </div>
-          <p>
-            <Link href="/auth/credentials">
-              <a>Sign in with credentials</a>
-            </Link>
-          </p>
-          <p>
-            <Link href="/">
-              <a>Home</a>
-            </Link>
-          </p>
-        </div>
-      );
-    }
+            )}
+          </Authed>
+          <NotAuthed>
+            {({ providers }) => (
+              <div>
+                <div>
+                  <h1 className={example}>NextAuth Example</h1>
+                </div>
+                <div>
+                  <div>
+                    <div>
+                      <h4>Sign In</h4>
+                      <div>
+                        <SignInButtons providers={providers} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p>
+                  <Link href="/">
+                    <a>Home</a>
+                  </Link>
+                </p>
+              </div>
+            )}
+          </NotAuthed>
+        </React.Fragment>
+      </StateContainer>
+    );
   }
 }
