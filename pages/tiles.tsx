@@ -4,6 +4,9 @@ import JSZip from "jszip";
 import { NextAuth } from "next-auth/client";
 // @ts-ignore
 import React, { ChangeEvent } from "react";
+import Authed from "../app/components/atoms/Authed";
+import NotAuthed from "../app/components/atoms/NotAuthed";
+import StateContainer from "../app/components/templates/StateContainer";
 
 interface ImageDetails {
   h: number;
@@ -11,6 +14,7 @@ interface ImageDetails {
   tilesX: number;
   tilesY: number;
   data: Uint8ClampedArray;
+  tileDimension?: number;
 }
 
 interface Tile {
@@ -19,10 +23,33 @@ interface Tile {
   y: number;
 }
 
-export default class extends React.Component {
+const layerMap = [4, 4, 16, 64, 256];
+
+interface Props {
+  session: any;
+  linkedAccounts: any;
+  providers: any;
+}
+
+interface State {
+  render: boolean;
+  tileDimension: number;
+  z: number;
+}
+
+export default class extends React.Component<Props, State> {
+  public static async getInitialProps({ req }: { req: any }) {
+    return {
+      linkedAccounts: await NextAuth.linked({ req }),
+      providers: await NextAuth.providers({ req }),
+      session: await NextAuth.init({ req }),
+    };
+  }
+
   public state = {
     render: false,
     tileDimension: 256,
+    z: 1,
   };
 
   private reader?: FileReader;
@@ -54,48 +81,69 @@ export default class extends React.Component {
   }
 
   public render() {
-    const { tileDimension } = this.state;
+    const { z, tileDimension } = this.state;
     return (
-      <div>
-        <input type="file" onChange={this.handleFile} />
-        <button onClick={this.download}>Download</button>
-        <button onClick={this.upload}>Upload</button>
-        <input
-          disabled
-          type="range"
-          min={10}
-          max={512}
-          value={tileDimension}
-          onChange={this.handleState("tileDimension")}
-        />
-        <input
-          type="number"
-          min={10}
-          max={512}
-          value={tileDimension}
-          onChange={this.handleState("tileDimension")}
-        />
-        <canvas id="tiles" />
-        <canvas id="tile" style={{ display: "none" }} />
-      </div>
+      <StateContainer
+        session={this.props.session}
+        linkedAccounts={this.props.linkedAccounts}
+      >
+        <React.Fragment>
+          <Authed>
+            {() => (
+              <div>
+                <input type="file" onChange={this.handleFile} />
+                <button onClick={this.download}>Download</button>
+                <button onClick={this.upload}>Upload</button>
+                <input
+                  type="range"
+                  min={1}
+                  max={4}
+                  value={z}
+                  onChange={this.handleState("z")}
+                />
+                <input
+                  disabled
+                  type="range"
+                  min={10}
+                  max={512}
+                  value={tileDimension}
+                  onChange={this.handleState("tileDimension")}
+                />
+                <input
+                  type="number"
+                  min={10}
+                  max={512}
+                  value={tileDimension}
+                  onChange={this.handleState("tileDimension")}
+                />
+                <canvas id="tiles" />
+                <canvas id="tile" style={{ display: "none" }} />
+              </div>
+            )}
+          </Authed>
+          <NotAuthed>
+            {() => <div>Please login before creating tiles</div>}
+          </NotAuthed>
+        </React.Fragment>
+      </StateContainer>
     );
   }
 
   private handleState = (field: string) => {
     return (e: ChangeEvent) => {
-      return; // disabled for now due to call stack issues
-      this.setState({ [field]: (e.target as any).value });
+      this.setState({ [field]: (e.target as any).value } as any);
     };
   };
 
   private handleFile = (e: ChangeEvent) => {
-    const { tileDimension } = this.state;
     if (!(e.target as any).files) {
       return;
     }
+    const { z } = this.state;
     const reader = this.reader!;
     const img = this.img!;
     const ctx = this.ctx!;
+    const tileCtx = this.tileCtx!;
     reader.readAsDataURL((e.target as any).files[0]);
     reader.onload = () => {
       img.src = reader.result as string;
@@ -103,10 +151,14 @@ export default class extends React.Component {
         const details: ImageDetails = {
           data: new Uint8ClampedArray(),
           h: img.height,
-          tilesX: Math.floor(img.width / tileDimension),
-          tilesY: Math.floor(img.height / tileDimension),
+          tileDimension:
+            Math.min(img.height, img.width) / Math.sqrt(layerMap[z] as number),
+          tilesX: Math.sqrt(layerMap[z]),
+          tilesY: Math.sqrt(layerMap[z]),
           w: img.width,
         };
+        tileCtx.canvas.width = details.tileDimension!;
+        tileCtx.canvas.height = details.tileDimension!;
         ctx.canvas.height = details.h;
         ctx.canvas.width = details.w;
         ctx.drawImage(img, 0, 0);
@@ -154,24 +206,23 @@ export default class extends React.Component {
   }
 
   private getTileGenerator = (details: ImageDetails) => {
-    const { tileDimension } = this.state;
     return (inputX: number, inputY: number) => {
-      const x = inputX * tileDimension;
-      const y = inputY * tileDimension;
+      const x = inputX * details.tileDimension!;
+      const y = inputY * details.tileDimension!;
       const tileData = [];
-      for (let i = 0; i < tileDimension; i++) {
+      for (let i = 0; i < details.tileDimension!; i++) {
         tileData.push(
           ...details.data.slice(
             this.getIndex(details, x, y + i),
-            this.getIndex(details, x + tileDimension, y + i),
+            this.getIndex(details, x + details.tileDimension!, y + i),
           ),
         );
       }
       const tile: Tile = {
         data: new ImageData(
           new Uint8ClampedArray(tileData),
-          tileDimension,
-          tileDimension,
+          details.tileDimension!,
+          details.tileDimension!,
         ),
         x,
         y,
@@ -206,6 +257,7 @@ export default class extends React.Component {
   };
 
   private upload = async () => {
+    const { z } = this.state;
     const tileCtx = this.tileCtx!;
     const images = await Promise.all(
       this.tiles.map(
@@ -217,13 +269,14 @@ export default class extends React.Component {
       ),
     );
     const form = new FormData();
-    const { tilesX, tilesY } = this.details;
-    const getXY = (i: number) => `${i % tilesX}-${Math.round(i / tilesY)}`;
-    images.forEach((img, i) =>
-      form.append("tiles", img as any, `tile-${getXY(i)}.png`),
-    );
+    const { tilesX } = this.details;
+    const getXY = (i: number) => `${i % tilesX}-${Math.floor(i / tilesX)}`;
+    images.forEach((img, i) => {
+      console.info("tile", 1, getXY(i));
+      form.append("tiles", img as any, `tile-${getXY(i)}.png`);
+    });
     const token = await NextAuth.csrfToken();
-    fetch("/api/upload/test/1", {
+    fetch(`/api/upload/test/${z}`, {
       body: form,
       credentials: "same-origin",
       headers: new Headers({
