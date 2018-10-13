@@ -40,6 +40,11 @@ refs:
         paths:
           - node_modules
         key: v1-dependencies-{{ checksum "yarn.lock" }}
+    - &Deploy_production
+      run:
+        name: Deploy over SSH to production
+        command: |
+          ssh $SSH_USER@$SSH_HOST 'cd /var/www/shentaria && git pull && yarn build && pm2 restart shentaria'
 
 jobs:
   all:
@@ -74,7 +79,7 @@ jobs:
       - *Install
       - *Save_node_modules
       - *Test
-      - run: echo "Deploy to production"
+      - *Deploy_production
 
 workflows:
   version: 2
