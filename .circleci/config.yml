@@ -40,11 +40,16 @@ refs:
         paths:
           - node_modules
         key: v1-dependencies-{{ checksum "yarn.lock" }}
+    - &Copy_to_production
+      run:
+        name: Copy build to production
+        command: |
+          scp -o "StrictHostKeyChecking no" -r ~/repo/ $SSH_USER@$SSH_HOST:/var/www/shentaria
     - &Deploy_production
       run:
         name: Deploy over SSH to production
         command: |
-          ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST 'cd /var/www/shentaria && git pull && yarn build && pm2 restart shentaria'
+          ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST 'pm2 restart shentaria'
 
 jobs:
   all:
@@ -79,6 +84,7 @@ jobs:
       - *Install
       - *Save_node_modules
       - *Test
+      - *Copy_to_production
       - *Deploy_production
 
 workflows:
