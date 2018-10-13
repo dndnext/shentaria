@@ -25,7 +25,7 @@ class MapMaker extends React.Component<{}, State> {
           onChange={this.handleChange}
           value={z}
         />
-        <MapTilePreview file={file} z={z} />
+        <MapTilePreview download file={file} name="Test" upload z={z} />
       </React.Fragment>
     );
   }

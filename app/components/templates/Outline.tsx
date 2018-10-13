@@ -7,6 +7,11 @@ const Outline: React.SFC<{ children: ReactChild }> = ({ children }) => (
     <div>
       <ul>
         <li>
+          <Link href="/">
+            <a>Home</a>
+          </Link>
+        </li>
+        <li>
           <Link href="/account">
             <a>Account</a>
           </Link>

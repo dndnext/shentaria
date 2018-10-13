@@ -95,7 +95,7 @@ export default class extends React.Component<
             {({ providers }) => (
               <div>
                 <div>
-                  <h1 className={example}>NextAuth Example</h1>
+                  <h1 className={example}>Shentaria</h1>
                 </div>
                 <div>
                   <div>

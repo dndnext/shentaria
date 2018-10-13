@@ -7,6 +7,7 @@ import React from "react";
 import Authed from "../app/components/atoms/Authed";
 import CsrfToken from "../app/components/atoms/CsrfToken";
 import NotAuthed from "../app/components/atoms/NotAuthed";
+import Outline from "../app/components/templates/Outline";
 import StateContainer from "../app/components/templates/StateContainer";
 
 export default class extends React.Component<{
@@ -41,37 +42,39 @@ export default class extends React.Component<{
           session={this.props.session}
           linkedAccounts={this.props.linkedAccounts}
         >
-          <div>
-            <Authed>
-              {({ signout }) => (
-                <React.Fragment>
+          <Outline>
+            <React.Fragment>
+              <Authed>
+                {({ signout }) => (
+                  <React.Fragment>
+                    <p>
+                      <Link href="/auth">
+                        <a>Manage Account</a>
+                      </Link>
+                    </p>
+                    <form
+                      id="signout"
+                      method="post"
+                      action="/auth/signout"
+                      onSubmit={signout}
+                    >
+                      <CsrfToken />
+                      <button type="submit">Sign out</button>
+                    </form>
+                  </React.Fragment>
+                )}
+              </Authed>
+              <NotAuthed>
+                {() => (
                   <p>
                     <Link href="/auth">
-                      <a>Manage Account</a>
+                      <a>Sign in</a>
                     </Link>
                   </p>
-                  <form
-                    id="signout"
-                    method="post"
-                    action="/auth/signout"
-                    onSubmit={signout}
-                  >
-                    <CsrfToken />
-                    <button type="submit">Sign out</button>
-                  </form>
-                </React.Fragment>
-              )}
-            </Authed>
-            <NotAuthed>
-              {() => (
-                <p>
-                  <Link href="/auth">
-                    <a>Sign in</a>
-                  </Link>
-                </p>
-              )}
-            </NotAuthed>
-          </div>
+                )}
+              </NotAuthed>
+            </React.Fragment>
+          </Outline>
         </StateContainer>
       </React.Fragment>
     );

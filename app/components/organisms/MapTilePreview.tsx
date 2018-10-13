@@ -1,9 +1,17 @@
+import { saveAs } from "file-saver";
+import JSZip from "jszip";
+// @ts-ignore
+import { NextAuth } from "next-auth/client";
+// @ts-ignore
 import debounce from "p-debounce";
 import React from "react";
 import { layerMap } from "../../constants";
 
 interface Props {
+  download: boolean;
   file: any;
+  name: string;
+  upload: boolean;
   z: number;
 }
 
@@ -22,11 +30,19 @@ interface Tile {
   y: number;
 }
 
+interface BlobTile {
+  blob: Blob;
+  x: number;
+  y: number;
+  z: number;
+}
+
 class MapTilePreview extends React.Component<Props> {
   private preview?: HTMLCanvasElement;
   private tilePreview?: HTMLCanvasElement;
   private previewCtx?: CanvasRenderingContext2D;
   private tileCtx?: CanvasRenderingContext2D;
+  private details?: ImageDetails;
   private reader?: FileReader;
   private img?: HTMLImageElement;
 
@@ -51,20 +67,32 @@ class MapTilePreview extends React.Component<Props> {
     ) {
       console.info("read", this.reader);
       const details = await this.getFileDetails();
+      this.details = details;
       await this.draw(details);
     }
   }
 
   public render() {
+    const { download, upload, file } = this.props;
     return (
       <React.Fragment>
+        {upload ? (
+          <button onClick={this.upload} disabled={!file}>
+            Upload
+          </button>
+        ) : null}
+        {download ? (
+          <button onClick={this.download} disabled={!file}>
+            Download
+          </button>
+        ) : null}
         <canvas
           ref={ref => (this.preview = ref!)}
           style={{ border: "1px solid red", width: "100%" }}
         />
         <canvas
           ref={ref => (this.tilePreview = ref!)}
-          style={{ border: "1px solid red" }}
+          style={{ border: "1px solid red", display: "none" }}
         />
       </React.Fragment>
     );
@@ -79,6 +107,7 @@ class MapTilePreview extends React.Component<Props> {
       tilesY: 1,
       w: 0,
     });
+
   private draw: (details: ImageDetails) => void = () => ({});
 
   private drawRaw = async (details: ImageDetails) =>
@@ -182,6 +211,75 @@ class MapTilePreview extends React.Component<Props> {
         };
       };
     });
+
+  private getTileBlobs = async () => {
+    const { z } = this.props;
+    const tileCtx = this.tileCtx!;
+    const { tilesX, tilesY, tileDimension } = this.details!;
+    const xCoords = Array.from({ length: tilesX }, (_, i) => i * tileDimension);
+    const yCoords = Array.from({ length: tilesY }, (_, i) => i * tileDimension);
+    const tempTiles: Array<{ x: number; y: number }> = [];
+    xCoords.forEach(x => {
+      yCoords.forEach(y => {
+        tempTiles.push({ x, y });
+      });
+    });
+    const tiles: BlobTile[] = await Promise.all(
+      tempTiles.map(({ x, y }) => {
+        tileCtx.clearRect(0, 0, tileCtx.canvas.width, tileCtx.canvas.height);
+        tileCtx.drawImage(
+          this.img!,
+          x,
+          y,
+          tileDimension,
+          tileDimension,
+          0,
+          0,
+          tileDimension,
+          tileDimension,
+        );
+        const getBlob: Promise<BlobTile> = new Promise(resolve => {
+          const niceX = x / tileDimension;
+          const niceY = y / tileDimension;
+          tileCtx.canvas.toBlob(blob =>
+            resolve({ blob: blob!, x: niceX, y: niceY, z }),
+          );
+        });
+        return getBlob;
+      }),
+    );
+    return tiles;
+  };
+
+  private download = async () => {
+    const blobs = await this.getTileBlobs();
+    const zip = new JSZip();
+    blobs.forEach(({ x, y, z, blob }) =>
+      zip.file(`tile-${z}-${x}-${y}.png`, blob),
+    );
+    const content = await zip.generateAsync({ type: "blob" });
+    saveAs(content, "tiles.zip");
+  };
+
+  private upload = async () => {
+    const { z } = this.props;
+    const blobs = await this.getTileBlobs();
+    const form = new FormData();
+    blobs.forEach(({ x, y, blob }) => {
+      form.append("tiles", blob, `tile-${x}-${y}.png`);
+    });
+    const token = await NextAuth.csrfToken();
+    fetch(`/api/upload/test/${z}`, {
+      body: form,
+      credentials: "same-origin",
+      headers: new Headers({
+        "x-csrf-token": token,
+      }),
+      method: "POST",
+    }).then(res => {
+      console.info(res.ok);
+    });
+  };
 }
 
 export default MapTilePreview;
