@@ -44,7 +44,7 @@ refs:
       run:
         name: Deploy over SSH to production
         command: |
-          ssh $SSH_USER@$SSH_HOST 'cd /var/www/shentaria && git pull && yarn build && pm2 restart shentaria'
+          ssh -o "StrictHostKeyChecking no" $SSH_USER@$SSH_HOST 'cd /var/www/shentaria && git pull && yarn build && pm2 restart shentaria'
 
 jobs:
   all:
