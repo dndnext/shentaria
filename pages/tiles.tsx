@@ -1,4 +1,4 @@
-// import { saveAs } from "file-saver";
+import { saveAs } from "file-saver";
 import JSZip from "jszip";
 // @ts-ignore
 import { NextAuth } from "next-auth/client";
@@ -70,13 +70,17 @@ export default class extends React.Component<Props, State> {
     const { tileDimension } = this.state;
     this.reader = new FileReader();
     const canvas = document.getElementById("tiles") as HTMLCanvasElement;
-    canvas.width = 500;
-    canvas.height = 500;
-    this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    if (canvas) {
+      canvas.width = 500;
+      canvas.height = 500;
+      this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    }
     const tileCanvas = document.getElementById("tile") as HTMLCanvasElement;
-    tileCanvas.width = tileDimension;
-    tileCanvas.height = tileDimension;
-    this.tileCtx = tileCanvas.getContext("2d") as CanvasRenderingContext2D;
+    if (tileCanvas) {
+      tileCanvas.width = tileDimension;
+      tileCanvas.height = tileDimension;
+      this.tileCtx = tileCanvas.getContext("2d") as CanvasRenderingContext2D;
+    }
     this.img = new Image();
   }
 

@@ -1146,6 +1146,10 @@
   version "10.11.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.11.4.tgz#e8bd933c3f78795d580ae41d86590bfc1f4f389d"
 
+"@types/p-debounce@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/p-debounce/-/p-debounce-1.0.0.tgz#c7fab3d61f9bc6454337c4aef0dec069456d00ee"
+
 "@types/prop-types@*":
   version "15.5.6"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.5.6.tgz#9c03d3fed70a8d517c191b7734da2879b50ca26c"
@@ -6531,6 +6535,10 @@ output-file-sync@^1.1.0:
     graceful-fs "^4.1.4"
     mkdirp "^0.5.1"
     object-assign "^4.1.0"
+
+p-debounce@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/p-debounce/-/p-debounce-1.0.0.tgz#cb7f2cbeefd87a09eba861e112b67527e621e2fd"
 
 p-finally@^1.0.0:
   version "1.0.0"
