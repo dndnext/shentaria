@@ -116,7 +116,7 @@ export default class extends React.Component<{}, State> {
             maxZoom={5}
             onViewportChanged={this.onChange}
           >
-            <TileLayer url="/static/tiles/test/{z}/{x}/{y}.png" noWrap />
+            <TileLayer url="/static/tiles/Test/{z}/{x}/{y}.png" noWrap />
             {markers.map(({ icon, position, text }: MarkerInfo, i) => (
               <Marker key={i} position={position} icon={this.icons[icon]}>
                 <Popup>{text}</Popup>
