@@ -12,14 +12,13 @@ const mkdir = path =>
   });
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const { mapName, z } = req.params;
-    const [_, x, y] = file.originalname.split(".")[0].split("-");
+  destination: (req, _, cb) => {
+    const { mapName, z, x } = req.params;
     const dir = `static/tiles/${mapName}/${z}/${x}`;
     mkdir(dir).then(madeDir => cb(null, madeDir), cb);
   },
-  filename: (req, file, cb) => {
-    const [_, x, y] = file.originalname.split(".")[0].split("-");
+  filename: (req, _, cb) => {
+    const { y } = req.params;
     cb(null, `${y}.png`);
   },
 });
@@ -27,9 +26,15 @@ const upload = multer({ storage });
 
 const router = new Router();
 
-router.post("/:mapName/:z", upload.array("tiles", 100), (req, res) => {
-  console.log(req.files);
-  res.send({ ok: 1 });
+router.post("/:mapName/:z/:x/:y", upload.single("tile", 10), (req, res) => {
+  const { mapName, z, x, y } = req.params;
+  res.send({
+    path: `/static/tiles/${mapName}/${z}/${x}/${y}.png`,
+    map: mapName,
+    x,
+    y,
+    z,
+  });
 });
 
 module.exports = router;

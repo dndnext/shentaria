@@ -15,12 +15,15 @@ interface Props {
   z: number;
 }
 
+interface State {
+  progress: number;
+}
+
 interface ImageDetails {
   h: number;
   w: number;
   tilesX: number;
   tilesY: number;
-  data: Uint8ClampedArray;
   tileDimension: number;
 }
 
@@ -37,7 +40,11 @@ interface BlobTile {
   z: number;
 }
 
-class MapTilePreview extends React.Component<Props> {
+class MapTilePreview extends React.Component<Props, State> {
+  public state = {
+    progress: 0,
+  };
+
   private preview?: HTMLCanvasElement;
   private tilePreview?: HTMLCanvasElement;
   private previewCtx?: CanvasRenderingContext2D;
@@ -65,6 +72,7 @@ class MapTilePreview extends React.Component<Props> {
       this.props.file &&
       (this.props.file !== newProps.file || this.props.z !== newProps.z)
     ) {
+      this.setState({ progress: 0 });
       console.info("read", this.reader);
       const details = await this.getFileDetails();
       this.details = details;
@@ -74,6 +82,7 @@ class MapTilePreview extends React.Component<Props> {
 
   public render() {
     const { download, upload, file } = this.props;
+    const { progress } = this.state;
     return (
       <React.Fragment>
         {upload ? (
@@ -86,6 +95,7 @@ class MapTilePreview extends React.Component<Props> {
             Download
           </button>
         ) : null}
+        <span>Progress: {progress}</span>
         <canvas
           ref={ref => (this.preview = ref!)}
           style={{ border: "1px solid red", width: "100%" }}
@@ -113,10 +123,7 @@ class MapTilePreview extends React.Component<Props> {
   private drawRaw = async (details: ImageDetails) =>
     new Promise(resolve => {
       const previewCtx = this.previewCtx!;
-      const img = this.img!;
       this.sizeCanvases(details);
-      previewCtx.drawImage(img, 0, 0);
-      details.data = previewCtx.getImageData(0, 0, details.w, details.h).data;
       previewCtx.clearRect(0, 0, details.w, details.h);
       this.drawTiles(details);
       this.drawGrid(details);
@@ -198,9 +205,8 @@ class MapTilePreview extends React.Component<Props> {
         img.src = reader.result as string;
         img.onload = () => {
           const tileDimension =
-            Math.min(img.height, img.width) / Math.sqrt(layerMap[z] as number);
+            Math.max(img.height, img.width) / Math.sqrt(layerMap[z] as number);
           const details: ImageDetails = {
-            data: new Uint8ClampedArray(),
             h: img.height,
             tileDimension,
             tilesX: Math.floor(img.width / tileDimension),
@@ -262,23 +268,27 @@ class MapTilePreview extends React.Component<Props> {
   };
 
   private upload = async () => {
-    const { z } = this.props;
+    const { name, z } = this.props;
     const blobs = await this.getTileBlobs();
-    const form = new FormData();
-    blobs.forEach(({ x, y, blob }) => {
-      form.append("tiles", blob, `tile-${x}-${y}.png`);
-    });
     const token = await NextAuth.csrfToken();
-    fetch(`/api/upload/test/${z}`, {
-      body: form,
-      credentials: "same-origin",
-      headers: new Headers({
-        "x-csrf-token": token,
+    const uploads = await Promise.all(
+      blobs.map(async ({ x, y, blob }) => {
+        const form = new FormData();
+        form.append("tile", blob, `tile-${x}-${y}.png`);
+        return fetch(`/api/upload/${name}/${z}/${x}/${y}`, {
+          body: form,
+          credentials: "same-origin",
+          headers: new Headers({
+            "x-csrf-token": token,
+          }),
+          method: "POST",
+        }).then(res => {
+          this.setState(({ progress }) => ({ progress: progress + 1 }));
+          return res.json();
+        });
       }),
-      method: "POST",
-    }).then(res => {
-      console.info(res.ok);
-    });
+    );
+    console.info(uploads);
   };
 }
 
