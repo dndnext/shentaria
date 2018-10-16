@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { RouterProps } from "next/router";
 import React from "react";
 import NoSSR from "react-no-ssr";
 
@@ -32,6 +33,10 @@ interface MarkerInfo {
   visible: number[];
 }
 
+interface Props {
+  router: RouterProps;
+}
+
 interface State {
   markers?: MarkerInfo[];
   render: boolean;
@@ -43,7 +48,7 @@ interface ViewportChange {
   zoom: number;
 }
 
-export default class extends React.Component<{}, State> {
+export default class extends React.Component<Props, State> {
   public state = {
     markers: [],
     render: false,
@@ -76,6 +81,10 @@ export default class extends React.Component<{}, State> {
   }
 
   public render() {
+    const name =
+      this.props.router && this.props.router.query
+        ? (this.props.router.query.id as string)
+        : "Test";
     const { render, markers } = this.state;
     let Map, TileLayer, Marker: any, Popup: any;
     if (render) {
@@ -116,7 +125,7 @@ export default class extends React.Component<{}, State> {
             maxZoom={5}
             onViewportChanged={this.onChange}
           >
-            <TileLayer url="/static/tiles/Test/{z}/{x}/{y}.png" noWrap />
+            <TileLayer url={`/static/tiles/${name}/{z}/{x}/{y}.png`} noWrap />
             {markers.map(({ icon, position, text }: MarkerInfo, i) => (
               <Marker key={i} position={position} icon={this.icons[icon]}>
                 <Popup>{text}</Popup>
