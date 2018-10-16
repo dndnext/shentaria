@@ -1,16 +1,4 @@
-import React, { Consumer, FormEvent } from "react";
-
-interface Session {
-  user: any;
-  csrfToken: any;
-}
-
-export interface Consumer {
-  linkedAccounts: any[];
-  providers: any[];
-  session: Partial<Session>;
-  signout: (e?: FormEvent) => Promise<void>;
-}
+import React from "react";
 
 export const UserContext = React.createContext({
   linkedAccounts: [],
@@ -20,4 +8,4 @@ export const UserContext = React.createContext({
 });
 
 export const UserProvider = UserContext.Provider;
-export const UserConsumer = UserContext.Consumer as React.Consumer<Consumer>;
+export const UserConsumer = UserContext.Consumer;
