@@ -1,10 +1,10 @@
 import { RouterProps } from "next/router";
 import React from "react";
 import connect from "../../../lib/connect";
-import { EncyclopediaEntry } from "../../../types";
+import { EncyclopediaEntry, PromiseState } from "../../../types";
 
 interface Props {
-  entry: any;
+  entry: PromiseState<EncyclopediaEntry>;
   router: RouterProps;
 }
 
@@ -17,11 +17,14 @@ class ViewEncyclopediaEntry extends React.Component<Props> {
   public render() {
     const { entry } = this.props;
     if (entry.fulfilled) {
-      const loaded: EncyclopediaEntry = entry.value;
+      const loaded = entry.value;
       return (
         <div>
           <h4>{loaded.name}</h4>
           <p>{loaded.content}</p>
+          <a href={`/encyclopedia/${loaded.encyclopedia}`}>
+            Back to Encyclopedia
+          </a>
         </div>
       );
     } else if (entry.pending) {

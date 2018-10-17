@@ -4,7 +4,6 @@ import connect from "../../../lib/connect";
 import { Encyclopedia } from "../../../types";
 
 interface Props {
-  encyclopedia: any[];
   postEncyclopedia: (d: Partial<Encyclopedia>) => Promise<Encyclopedia>;
   router: RouterProps;
 }

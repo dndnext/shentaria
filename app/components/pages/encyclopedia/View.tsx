@@ -1,19 +1,11 @@
 import { RouterProps } from "next/router";
 import React from "react";
 import connect from "../../../lib/connect";
-import { Encyclopedia, EncyclopediaEntry } from "../../../types";
+import { Encyclopedia, EncyclopediaEntry, PromiseState } from "../../../types";
 
 interface Props {
-  encyclopedia: {
-    fulfilled: boolean;
-    pending: boolean;
-    value: Encyclopedia;
-  };
-  entries: {
-    fulfilled: boolean;
-    pending: boolean;
-    value: EncyclopediaEntry[];
-  };
+  encyclopedia: PromiseState<Encyclopedia>;
+  entries: PromiseState<EncyclopediaEntry[]>;
   router: RouterProps;
 }
 
@@ -37,16 +29,26 @@ class ViewEncyclopedia extends React.Component<Props> {
             </React.Fragment>
           ),
         )}
-        {this.renderPromise(entries.fulfilled, entries.pending, () => (
-          <React.Fragment>
-            <h5>Entries</h5>
-            {entries.value.map(({ name, content }) => (
-              <div>
-                {name} | <small>{content}</small>
-              </div>
-            ))}
-          </React.Fragment>
-        ))}
+        {this.renderPromise(
+          entries.fulfilled,
+          entries.pending,
+          () =>
+            encyclopedia.value ? (
+              <React.Fragment>
+                <h5>Entries</h5>
+                <a href={`/encyclopedia/${encyclopedia.value._id}/new`}>
+                  Add entry
+                </a>
+                {entries.value.map(({ _id, name, content }) => (
+                  <div>
+                    <a href={`/encyclopedia/entry/${_id}`}>
+                      {name} | <small>{content}</small>
+                    </a>
+                  </div>
+                ))}
+              </React.Fragment>
+            ) : null,
+        )}
       </React.Fragment>
     );
   }

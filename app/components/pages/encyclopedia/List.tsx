@@ -15,15 +15,20 @@ class NewEncyclopedia extends React.Component<Props> {
   public render() {
     const { encyclopedias } = this.props;
     if (encyclopedias.fulfilled) {
-      return encyclopedias.value.map(
-        ({ _id, name, description }: Encyclopedia) => (
-          <div key={_id}>
-            <a href={`/encyclopedia/${_id}`}>
-              <strong>{name}</strong>
-            </a>
-            <p>{description}</p>
-          </div>
-        ),
+      return (
+        <React.Fragment>
+          <a href="/new/encyclopedia">New Encyclopedia</a>
+          {encyclopedias.value.map(
+            ({ _id, name, description }: Encyclopedia) => (
+              <div key={_id}>
+                <a href={`/encyclopedia/${_id}`}>
+                  <strong>{name}</strong>
+                </a>
+                <p>{description}</p>
+              </div>
+            ),
+          )}
+        </React.Fragment>
       );
     } else if (encyclopedias.pending) {
       return <div>Loading</div>;

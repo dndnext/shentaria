@@ -1,14 +1,10 @@
 import { RouterProps } from "next/router";
 import React, { ChangeEvent, FormEvent } from "react";
 import connect from "../../../lib/connect";
-import { Encyclopedia, EncyclopediaEntry } from "../../../types";
+import { Encyclopedia, EncyclopediaEntry, PromiseState } from "../../../types";
 
 interface Props {
-  encyclopedia: {
-    fulfilled: boolean;
-    pending: boolean;
-    value: Encyclopedia;
-  };
+  encyclopedia: PromiseState<Encyclopedia>;
   postEntry: (d: Partial<EncyclopediaEntry>) => Promise<EncyclopediaEntry>;
   router: RouterProps;
 }
@@ -23,11 +19,12 @@ class NewEncyclopediaEntry extends React.Component<Props> {
     const { name, content } = this.state;
     const { encyclopedia } = this.props;
     if (encyclopedia.fulfilled) {
-      const loaded: Encyclopedia = encyclopedia.value;
+      const loaded = encyclopedia.value;
       return (
         <div>
           <h4>{loaded.name}</h4>
           <p>{loaded.description}</p>
+          <a href={`/encyclopedia/${loaded._id}`}>Back to encyclopedia</a>
           <form onSubmit={this.submit}>
             <input
               type="text"

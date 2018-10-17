@@ -17,6 +17,11 @@ const Outline: React.SFC<{ children: ReactChild }> = ({ children }) => (
           </Link>
         </li>
         <li>
+          <Link href="/encyclopedia">
+            <a>Encyclopedias</a>
+          </Link>
+        </li>
+        <li>
           <Link href="/campaign">
             <a>Campaigns</a>
           </Link>
