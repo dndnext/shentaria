@@ -32,8 +32,8 @@ const Outline: React.SFC<{ children: ReactChild }> = ({ children }) => (
           </Link>
         </li>
         <li>
-          <Link href="/map/viewer">
-            <a>Map Viewer</a>
+          <Link href="/map">
+            <a>Maps</a>
           </Link>
         </li>
       </ul>
