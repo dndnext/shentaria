@@ -3,9 +3,17 @@ const { Router } = require("express");
 function createModelApi(Model, boltOnRouter) {
   const router = new Router();
 
+  if (boltOnRouter) router.use("/", boltOnRouter);
+
   router.get("/", async (_, res) => {
     const result = await Model.find();
     res.send(result);
+  });
+
+  router.get("/:id", async (req, res) => {
+    const { id } = req.params;
+    const m = await Model.findById(id);
+    res.send(m);
   });
 
   router.post("/", async (req, res) => {
@@ -29,11 +37,6 @@ function createModelApi(Model, boltOnRouter) {
     const result = await m.remove();
     res.send(result);
   });
-
-  if (!!boltOnRouter) {
-    console.log("trying to use", !!boltOnRouter, boltOnRouter);
-    router.use("/", boltOnRouter);
-  }
 
   return router;
 }

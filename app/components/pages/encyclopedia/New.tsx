@@ -1,10 +1,12 @@
+import { RouterProps } from "next/router";
 import React, { ChangeEvent, FormEvent } from "react";
 import connect from "../../../lib/connect";
 import { Encyclopedia } from "../../../types";
 
 interface Props {
   encyclopedia: any[];
-  postEncyclopedia: (d: Partial<Encyclopedia>) => void;
+  postEncyclopedia: (d: Partial<Encyclopedia>) => Promise<Encyclopedia>;
+  router: RouterProps;
 }
 
 class NewEncyclopedia extends React.Component<Props> {
@@ -40,11 +42,14 @@ class NewEncyclopedia extends React.Component<Props> {
   };
 }
 
-export default connect(() => ({
+export default connect((props: Props) => ({
   postEncyclopedia: (data: Partial<Encyclopedia>) => ({
     encyclopedia: {
       body: JSON.stringify(data),
       method: "POST",
+      then: (encyclopedia: Encyclopedia) => {
+        props.router.push(`/encyclopedia/${encyclopedia._id}`);
+      },
       url: "/api/encyclopedia",
     },
   }),
