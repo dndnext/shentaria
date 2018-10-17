@@ -21,6 +21,7 @@ export interface Encyclopedia extends ModelBase {
 
 export interface EncyclopediaEntry extends ModelBase {
   name: string;
+  encyclopedia: string;
   coverImage: string;
   content: string;
   categories: string[];
@@ -44,4 +45,15 @@ export interface Marker {
   visibleLayers: Array<"*" | number>;
   existingLayers: Array<"*" | number>;
   type: string;
+}
+
+export interface PromiseState<T> {
+  pending: boolean;
+  refreshing: boolean;
+  fulfilled: boolean;
+  rejected: boolean;
+  settled: boolean;
+  value: T;
+  reason: Error | null;
+  meta: any;
 }
