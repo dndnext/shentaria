@@ -10,11 +10,6 @@ interface Props {
 }
 
 class ViewEncyclopedia extends React.Component<Props> {
-  public state = {
-    description: "",
-    name: "",
-  };
-
   public render() {
     const { encyclopedia, entries } = this.props;
     return (
