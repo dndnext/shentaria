@@ -3,4 +3,13 @@ import fetch from "isomorphic-fetch";
 import { connect } from "react-refetch";
 // @ts-ignore
 
-export default connect.defaults({ fetch });
+const token = JSON.parse(localStorage.session).csrfToken;
+
+connect.defaults({
+  fetch,
+  headers: {
+    "x-csrf-token": token,
+  },
+});
+
+export default connect;
