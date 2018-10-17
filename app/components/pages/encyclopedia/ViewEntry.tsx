@@ -8,32 +8,23 @@ interface Props {
   router: RouterProps;
 }
 
-class ViewEncyclopediaEntry extends React.Component<Props> {
-  public state = {
-    description: "",
-    name: "",
-  };
-
-  public render() {
-    const { entry } = this.props;
-    if (entry.fulfilled) {
-      const loaded = entry.value;
-      return (
-        <div>
-          <h4>{loaded.name}</h4>
-          <p>{loaded.content}</p>
-          <a href={`/encyclopedia/${loaded.encyclopedia}`}>
-            Back to Encyclopedia
-          </a>
-        </div>
-      );
-    } else if (entry.pending) {
-      return <div>Loading</div>;
-    } else {
-      return <div>Error</div>;
-    }
+const ViewEncyclopediaEntry = ({ entry }: Props) => {
+  if (entry.fulfilled) {
+    return (
+      <div>
+        <h4>{entry.value.name}</h4>
+        <p>{entry.value.content}</p>
+        <a href={`/encyclopedia/${entry.value.encyclopedia}`}>
+          Back to Encyclopedia
+        </a>
+      </div>
+    );
+  } else if (entry.pending) {
+    return <div>Loading</div>;
+  } else {
+    return <div>Error</div>;
   }
-}
+};
 
 export default connect((props: Props) => ({
   entry: `/api/encyclopedia/entry/${props.router &&

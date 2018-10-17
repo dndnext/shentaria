@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const { apiRequireUser } = require("./middleware");
 
 function createModelApi(Model, boltOnRouter) {
   const router = new Router();
@@ -16,13 +17,14 @@ function createModelApi(Model, boltOnRouter) {
     res.send(m);
   });
 
-  router.post("/", async (req, res) => {
-    const m = new Model(req.body);
+  router.post("/", apiRequireUser, async (req, res) => {
+    let user = req.session.passport.user;
+    const m = new Model({ ...req.body, createdBy: user });
     const result = await m.save();
     res.send(result);
   });
 
-  router.put("/:id", async (req, res) => {
+  router.put("/:id", apiRequireUser, async (req, res) => {
     const { id } = req.params;
     const m = await Model.findByIdAndUpdate(id);
     m.set(req.body);
@@ -30,7 +32,7 @@ function createModelApi(Model, boltOnRouter) {
     res.send(result);
   });
 
-  router.delete("/:id", async (req, res) => {
+  router.delete("/:id", apiRequireUser, async (req, res) => {
     const { id } = req.params;
     const m = await Model.findById(id);
     if (!m) return res.status(400).send({ err: "Entity does not exist" });
