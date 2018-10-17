@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 const EncyclopediaEntrySchema = new mongoose.Schema(
   {
-    name: { type: "string" },
+    encyclopedia: { type: mongoose.ObjectId, required: true },
+    name: { type: "string", required: true },
     coverImage: { type: "string" },
     content: { type: "string" },
     categories: [String],

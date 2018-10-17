@@ -37,8 +37,30 @@ nextApp
 
         const handler = nextApp.getRequestHandler();
 
-        handleWithParam(app, "get", handler, "/map/maker/:id", "/map/maker");
-        handleWithParam(app, "get", handler, "/map/viewer/:id", "/map/viewer");
+        handleWithParam(app, "get", handler, "/map/editor/:id", "/map/editor");
+        handleWithParam(app, "get", handler, "/map/:id", "/map/view");
+        handleWithParam(app, "get", handler, "/campaign/:id", "/campaign/view");
+        handleWithParam(
+          app,
+          "get",
+          handler,
+          "/encyclopedia/entry/:id",
+          "/encyclopedia/view/entry",
+        );
+        handleWithParam(
+          app,
+          "get",
+          handler,
+          "/encyclopedia/:id/new",
+          "/new/encyclopedia/entry",
+        );
+        handleWithParam(
+          app,
+          "get",
+          handler,
+          "/encyclopedia/:id",
+          "/encyclopedia/view",
+        );
 
         app.all("*", handler);
 

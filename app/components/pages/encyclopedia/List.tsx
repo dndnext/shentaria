@@ -18,7 +18,9 @@ class NewEncyclopedia extends React.Component<Props> {
       return encyclopedias.value.map(
         ({ _id, name, description }: Encyclopedia) => (
           <div key={_id}>
-            <strong>{name}</strong>
+            <a href={`/encyclopedia/${_id}`}>
+              <strong>{name}</strong>
+            </a>
             <p>{description}</p>
           </div>
         ),

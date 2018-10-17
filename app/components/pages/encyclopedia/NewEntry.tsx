@@ -1,24 +1,50 @@
+import { RouterProps } from "next/router";
 import React, { ChangeEvent, FormEvent } from "react";
+import connect from "../../../lib/connect";
+import { Encyclopedia, EncyclopediaEntry } from "../../../types";
 
-class NewEncyclopediaEntry extends React.Component {
+interface Props {
+  encyclopedia: {
+    fulfilled: boolean;
+    pending: boolean;
+    value: Encyclopedia;
+  };
+  postEntry: (d: Partial<EncyclopediaEntry>) => Promise<EncyclopediaEntry>;
+  router: RouterProps;
+}
+
+class NewEncyclopediaEntry extends React.Component<Props> {
   public state = {
-    description: "",
+    content: "",
     name: "",
   };
 
   public render() {
-    const { name, description } = this.state;
-    return (
-      <form onSubmit={this.submit}>
-        <input type="text" name="name" onChange={this.onChange} value={name} />
-        <textarea
-          name="description"
-          onChange={this.onChange}
-          value={description}
-        />
-        <input type="submit" onClick={this.submit} />
-      </form>
-    );
+    const { name, content } = this.state;
+    const { encyclopedia } = this.props;
+    if (encyclopedia.fulfilled) {
+      const loaded: Encyclopedia = encyclopedia.value;
+      return (
+        <div>
+          <h4>{loaded.name}</h4>
+          <p>{loaded.description}</p>
+          <form onSubmit={this.submit}>
+            <input
+              type="text"
+              name="name"
+              onChange={this.onChange}
+              value={name}
+            />
+            <textarea name="content" onChange={this.onChange} value={content} />
+            <input type="submit" onClick={this.submit} />
+          </form>
+        </div>
+      );
+    } else if (encyclopedia.pending) {
+      return <div>Loading</div>;
+    } else {
+      return <div>Error</div>;
+    }
   }
 
   private onChange = ({
@@ -27,9 +53,28 @@ class NewEncyclopediaEntry extends React.Component {
     this.setState({ [target.name]: target.value });
   };
 
-  private submit = (e: MouseEvent | FormEvent) => {
+  private submit = async (e: MouseEvent | FormEvent) => {
     e.preventDefault();
+    const data = {
+      ...this.state,
+      encyclopedia: this.props.encyclopedia.value._id,
+    };
+    this.props.postEntry(data);
   };
 }
 
-export default NewEncyclopediaEntry;
+export default connect((props: Props) => ({
+  encyclopedia: `/api/encyclopedia/${props.router &&
+    props.router.query &&
+    props.router.query.id}`,
+  postEntry: (data: Partial<EncyclopediaEntry>) => ({
+    encyclopedia: {
+      body: JSON.stringify(data),
+      method: "POST",
+      then: (entry: EncyclopediaEntry) => {
+        props.router.push(`/encyclopedia/entry/${entry._id}`);
+      },
+      url: "/api/encyclopedia/entry",
+    },
+  }),
+}))(NewEncyclopediaEntry);
