@@ -7,10 +7,23 @@ import React, { ReactChild } from "react";
 import AuthTools from "../organisms/AuthTools";
 
 const styles = createStyles({
+  item: {
+    cursor: "pointer",
+    marginRight: 15,
+  },
   root: {
     flexGrow: 1,
   },
 });
+
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Account", href: "/account" },
+  { label: "Encyclopedia", href: "/encyclopedia" },
+  { label: "Campaigns", href: "/campaign" },
+  { label: "Map Editor", href: "/map/maker" },
+  { label: "Maps", href: "/map" },
+];
 
 const Outline: React.SFC<{ children: ReactChild; classes: any }> = ({
   children,
@@ -19,36 +32,13 @@ const Outline: React.SFC<{ children: ReactChild; classes: any }> = ({
   <div className={classes.root}>
     <AppBar position="static">
       <Toolbar>
-        <Link href="/">
-          <Typography variant="h6" color="inherit">
-            Home
-          </Typography>
-        </Link>
-        <Link href="/account">
-          <Typography variant="h6" color="inherit">
-            Account
-          </Typography>
-        </Link>
-        <Link href="/encyclopedia">
-          <Typography variant="h6" color="inherit">
-            Encyclopedias
-          </Typography>
-        </Link>
-        <Link href="/campaign">
-          <Typography variant="h6" color="inherit">
-            Campaigns
-          </Typography>
-        </Link>
-        <Link href="/map/maker">
-          <Typography variant="h6" color="inherit">
-            Map Maker
-          </Typography>
-        </Link>
-        <Link href="/map">
-          <Typography variant="h6" color="inherit">
-            Maps
-          </Typography>
-        </Link>
+        {links.map(({ label, href }) => (
+          <Link key={label} href={href}>
+            <Typography variant="h6" color="inherit" className={classes.item}>
+              {label}
+            </Typography>
+          </Link>
+        ))}
       </Toolbar>
     </AppBar>
     <div>
