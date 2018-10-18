@@ -9,6 +9,34 @@ import React from "react";
 import flush from "styled-jsx/server";
 
 class MyDocument extends Document<DefaultDocumentIProps & DocumentProps> {
+  public static getInitialProps(ctx: any) {
+    let pageContext;
+    const page = ctx.renderPage((Component: any) => {
+      const WrappedComponent = (props: any) => {
+        pageContext = props.pageContext;
+        return <Component {...props} />;
+      };
+
+      return WrappedComponent;
+    });
+
+    return {
+      ...page,
+      pageContext,
+      styles: (
+        <React.Fragment>
+          <style
+            id="jss-server-side"
+            dangerouslySetInnerHTML={{
+              __html: (pageContext as any).sheetsRegistry.toString(),
+            }}
+          />
+          {flush() || null}
+        </React.Fragment>
+      ),
+    };
+  }
+
   public render() {
     const { pageContext } = this.props as any;
 
@@ -37,33 +65,5 @@ class MyDocument extends Document<DefaultDocumentIProps & DocumentProps> {
     );
   }
 }
-
-MyDocument.getInitialProps = (ctx): any => {
-  let pageContext;
-  const page = ctx.renderPage(Component => {
-    const WrappedComponent = (props: any) => {
-      pageContext = props.pageContext;
-      return <Component {...props} />;
-    };
-
-    return WrappedComponent;
-  });
-
-  return {
-    ...page,
-    pageContext,
-    styles: (
-      <React.Fragment>
-        <style
-          id="jss-server-side"
-          dangerouslySetInnerHTML={{
-            __html: (pageContext as any).sheetsRegistry.toString(),
-          }}
-        />
-        {flush() || null}
-      </React.Fragment>
-    ),
-  };
-};
 
 export default MyDocument;
