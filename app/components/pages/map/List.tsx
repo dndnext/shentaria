@@ -1,24 +1,37 @@
+import Grid from "@material-ui/core/Grid";
+import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import React from "react";
 import connect from "../../../lib/connect";
 import { Map, PromiseState } from "../../../types";
+import AddButton from "../../atoms/NewButton";
+import MapCard from "../../molecules/MapCard";
 
 interface Props {
   maps: PromiseState<Map[]>;
+  classes: any;
 }
 
-const ListMap = ({ maps }: Props) => {
+const styles = createStyles(({ spacing }: Theme) => ({
+  item: {
+    cursor: "pointer",
+    margin: spacing.unit,
+  },
+}));
+
+const ListMap = ({ maps, classes }: Props) => {
   if (maps.fulfilled) {
     return (
       <React.Fragment>
-        <a href="/new/map">New Map</a>
-        {maps.value.map(({ _id, name, description }) => (
-          <div key={_id}>
-            <a href={`/map/${_id}`}>
-              <strong>{name}</strong>
-            </a>
-            <p>{description}</p>
-          </div>
-        ))}
+        <a href="/new/map">
+          <AddButton />
+        </a>
+        <Grid container>
+          {maps.value.map(map => (
+            <Grid item key={map._id} className={classes.item}>
+              <MapCard {...map} />
+            </Grid>
+          ))}
+        </Grid>
       </React.Fragment>
     );
   } else if (maps.pending) {
@@ -28,6 +41,8 @@ const ListMap = ({ maps }: Props) => {
   }
 };
 
-export default connect(() => ({
-  maps: "/api/map",
-}))(ListMap);
+export default withStyles(styles)(
+  connect(() => ({
+    maps: "/api/map",
+  }))(ListMap),
+);

@@ -1,7 +1,22 @@
+import Link from "next/link";
 import React from "react";
+import { UserConsumer } from "../contexts/user";
 
-export default class AuthTools extends React.Component {
-  public render() {
-    return <div>Auth</div>;
-  }
-}
+const AuthMenu: React.SFC = () => (
+  <UserConsumer>
+    {({ session }) => {
+      console.info("what", session);
+      return (
+        <div>
+          {(session && session.user && session.user.name) || (
+            <Link href="/auth">
+              <a>Login</a>
+            </Link>
+          )}
+        </div>
+      );
+    }}
+  </UserConsumer>
+);
+
+export default AuthMenu;

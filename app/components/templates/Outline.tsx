@@ -31,7 +31,12 @@ const Outline: React.SFC<{ children: ReactChild; classes: any }> = ({
 }) => (
   <div className={classes.root}>
     <AppBar position="static">
-      <Toolbar>
+      <Toolbar variant="dense">
+        <Link href="/">
+          <Typography variant="h5" color="inherit" className={classes.item}>
+            Shentaria
+          </Typography>
+        </Link>
         {links.map(({ label, href }) => (
           <Link key={label} href={href}>
             <Typography variant="h6" color="inherit" className={classes.item}>
@@ -39,12 +44,10 @@ const Outline: React.SFC<{ children: ReactChild; classes: any }> = ({
             </Typography>
           </Link>
         ))}
+        <AuthTools />
       </Toolbar>
     </AppBar>
-    <div>
-      Shentaria <AuthTools />
-    </div>
-    {children}
+    <div>{children}</div>
   </div>
 );
 

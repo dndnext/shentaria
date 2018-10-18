@@ -1,7 +1,10 @@
+import Grid from "@material-ui/core/Grid";
 import { RouterProps } from "next/router";
 import React from "react";
 import connect from "../../../lib/connect";
 import { Encyclopedia, EncyclopediaEntry, PromiseState } from "../../../types";
+import AddButton from "../../atoms/NewButton";
+import EncyclopediaEntryCard from "../../molecules/EncyclopediaEntryCard";
 
 interface Props {
   encyclopedia: PromiseState<Encyclopedia>;
@@ -32,14 +35,12 @@ class ViewEncyclopedia extends React.Component<Props> {
               <React.Fragment>
                 <h5>Entries</h5>
                 <a href={`/encyclopedia/${encyclopedia.value._id}/new`}>
-                  Add entry
+                  <AddButton />
                 </a>
-                {entries.value.map(({ _id, name, content }) => (
-                  <div>
-                    <a href={`/encyclopedia/entry/${_id}`}>
-                      {name} | <small>{content}</small>
-                    </a>
-                  </div>
+                {entries.value.map(entry => (
+                  <Grid item key={entry._id}>
+                    <EncyclopediaEntryCard {...entry} />
+                  </Grid>
                 ))}
               </React.Fragment>
             ) : null,

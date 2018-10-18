@@ -10,6 +10,7 @@
     "interface-name": false,
     "arrow-parens": false,
     "semicolon": [true, "always", "strict-bound-class-methods"],
-    "no-console": [true, "log"]
+    "no-console": [true, "log"],
+    "jsx-curly-spacing": false
   }
 }
