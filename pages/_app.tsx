@@ -3,6 +3,8 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import App, { AppProps, Container, DefaultAppIProps } from "next/app";
 import React from "react";
 import JssProvider from "react-jss/lib/JssProvider";
+import Outline from "../app/components/templates/Outline";
+import StateContainer from "../app/components/templates/StateContainer";
 import getPageContext from "../app/lib/getPageContext";
 
 class MyApp extends App<AppProps & DefaultAppIProps> {
@@ -34,7 +36,11 @@ class MyApp extends App<AppProps & DefaultAppIProps> {
             sheetsManager={this.pageContext.sheetsManager}
           >
             <CssBaseline />
-            <Component pageContext={this.pageContext} {...pageProps} />
+            <StateContainer>
+              <Outline>
+                <Component pageContext={this.pageContext} {...pageProps} />
+              </Outline>
+            </StateContainer>
           </MuiThemeProvider>
         </JssProvider>
       </Container>
