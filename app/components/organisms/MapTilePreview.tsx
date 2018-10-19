@@ -224,11 +224,10 @@ class MapTilePreview extends React.Component<Props, State> {
             previewCtx.canvas.width =
               tmpImg.width * Object.keys(existing).length;
           }
-          // TODO: This isn't right
           const details = {
-            h: tmpImg.height * (Number(j) + 1),
+            h: tmpImg.height,
             url: tmpImg.src,
-            w: tmpImg.width * (Number(i) + 1),
+            w: tmpImg.width,
             x: tmpImg.width * Number(i),
             y: tmpImg.height * Number(j),
           };
