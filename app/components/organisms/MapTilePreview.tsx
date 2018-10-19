@@ -4,7 +4,7 @@ import JSZip from "jszip";
 import { NextAuth } from "next-auth/client";
 // @ts-ignore
 import debounce from "p-debounce";
-import React from "react";
+import React, { MouseEvent } from "react";
 import { layerMap } from "../../constants";
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
   existing?: any;
   file: any;
   name: string;
+  onClick?: (x: number, y: number, canvas: HTMLCanvasElement) => void;
   upload: boolean;
   z: number;
 }
@@ -112,6 +113,7 @@ class MapTilePreview extends React.Component<Props, State> {
         <canvas
           ref={ref => (this.preview = ref!)}
           style={{ border: "1px solid red", width: "100%" }}
+          onClick={this.onPreviewClick}
         />
         <canvas
           ref={ref => (this.tilePreview = ref!)}
@@ -120,6 +122,16 @@ class MapTilePreview extends React.Component<Props, State> {
       </React.Fragment>
     );
   }
+
+  private onPreviewClick = (e: MouseEvent<HTMLCanvasElement>) => {
+    const t = e.target as HTMLCanvasElement;
+    const bb = t.getBoundingClientRect();
+    const x = e.clientX - bb.left;
+    const y = e.clientY - bb.top;
+    if (this.props.onClick) {
+      this.props.onClick(x, y, t);
+    }
+  };
 
   private getFileDetails: () => Promise<ImageDetails> = () =>
     Promise.resolve({
