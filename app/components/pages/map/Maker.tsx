@@ -1,16 +1,17 @@
 import { RouterProps } from "next/router";
 import React from "react";
 import connect from "../../../lib/connect";
-import { Icon, Map, PromiseState } from "../../../types";
+import { Icon, Map, Marker, PromiseState } from "../../../types";
 import MapMaker from "../../organisms/MapMaker";
 
 interface Props {
   icons: PromiseState<Icon[]>;
   router: RouterProps;
   map: PromiseState<{ map: Map; tiles: any }>;
+  postMarkers: (data: Array<Partial<Marker>>) => void;
 }
 
-const Maker = ({ icons, router, map }: Props) => {
+const Maker = ({ icons, router, map, postMarkers }: Props) => {
   if (icons.pending || map.pending) {
     return <div>Loading</div>;
   } else if (map.fulfilled && icons.fulfilled) {
@@ -23,7 +24,8 @@ const Maker = ({ icons, router, map }: Props) => {
         <div>{icons.value.length} icons</div>
         <MapMaker
           existing={map.value.tiles}
-          name={router.query && (router.query.id as string)}
+          name={getMapId(router)}
+          saveMarkers={postMarkers}
         />
       </div>
     );
@@ -32,9 +34,17 @@ const Maker = ({ icons, router, map }: Props) => {
   }
 };
 
+const getMapId = (router: RouterProps) =>
+  router && router.query && (router.query.id as string);
+
 export default connect((props: Props) => ({
   icons: "/api/icon",
-  map: `/api/map/${props.router &&
-    props.router.query &&
-    props.router.query.id}/full`,
+  map: `/api/map/${getMapId(props.router)}/full`,
+  postMarkers: (data: Array<Partial<Marker>>) => ({
+    markers: {
+      body: JSON.stringify(data),
+      method: "POST",
+      url: `/api/map/${getMapId(props.router)}/markers`,
+    },
+  }),
 }))(Maker);
