@@ -1,9 +1,9 @@
-import { RouterProps } from "next/router";
 import React, { ChangeEvent } from "react";
 import MapTilePreview from "./MapTilePreview";
 
 interface Props {
-  router: RouterProps;
+  name?: string;
+  existing?: any;
 }
 
 interface State {
@@ -18,11 +18,9 @@ class MapMaker extends React.Component<Props, State> {
   };
 
   public render() {
-    const name =
-      this.props.router && this.props.router.query
-        ? (this.props.router.query.id as string)
-        : "Test";
+    const { name = "Test", existing } = this.props;
     const { file, z } = this.state;
+    const existingLayer = existing.layers && existing.layers[z];
     return (
       <React.Fragment>
         <input type="file" onChange={this.handleFileChange} />
@@ -35,7 +33,14 @@ class MapMaker extends React.Component<Props, State> {
           onChange={this.handleChange}
           value={z}
         />
-        <MapTilePreview download file={file} name={name} upload z={z} />
+        <MapTilePreview
+          download
+          file={file}
+          name={name}
+          upload
+          z={z}
+          existing={existingLayer}
+        />
       </React.Fragment>
     );
   }

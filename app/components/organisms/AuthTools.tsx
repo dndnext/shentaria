@@ -5,7 +5,7 @@ import { UserConsumer } from "../contexts/user";
 const AuthMenu: React.SFC = () => (
   <UserConsumer>
     {({ session }) => {
-      console.info("what", session);
+      console.info("session", session);
       return (
         <div>
           {(session && session.user && session.user.name) || (

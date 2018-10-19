@@ -47,6 +47,14 @@ export interface Marker {
   type: string;
 }
 
+export interface Icon extends ModelBase {
+  name: string;
+  url: string;
+  anchor: number[];
+  size: number[];
+  popupAnchor: number[];
+}
+
 export interface PromiseState<T> {
   pending: boolean;
   refreshing: boolean;

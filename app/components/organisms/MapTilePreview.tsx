@@ -9,6 +9,7 @@ import { layerMap } from "../../constants";
 
 interface Props {
   download: boolean;
+  existing?: any;
   file: any;
   name: string;
   upload: boolean;
@@ -64,19 +65,31 @@ class MapTilePreview extends React.Component<Props, State> {
     this.img = new Image();
     this.getFileDetails = debounce(this.getFileDetailsRaw, 200);
     this.draw = debounce(this.drawRaw, 200);
+    this.handleExisting = debounce(this.handleExistingRaw, 200);
+    if (this.props.existing) {
+      this.handleExisting(this.props.existing);
+    }
   }
 
   public async componentDidUpdate(newProps: Props) {
-    console.info(this.props, newProps);
     if (
       this.props.file &&
       (this.props.file !== newProps.file || this.props.z !== newProps.z)
     ) {
       this.setState({ progress: 0 });
-      console.info("read", this.reader);
       const details = await this.getFileDetails();
       this.details = details;
       await this.draw(details);
+    } else if (this.props.existing && this.props.z !== newProps.z) {
+      this.handleExisting(this.props.existing);
+    } else if (!this.props.file && !this.props.existing) {
+      const previewCtx = this.previewCtx!;
+      previewCtx.clearRect(
+        0,
+        0,
+        previewCtx.canvas.width,
+        previewCtx.canvas.height,
+      );
     }
   }
 
@@ -119,6 +132,7 @@ class MapTilePreview extends React.Component<Props, State> {
     });
 
   private draw: (details: ImageDetails) => void = () => ({});
+  private handleExisting: (layer: any) => void = () => ({});
 
   private drawRaw = async (details: ImageDetails) =>
     new Promise(resolve => {
@@ -194,6 +208,41 @@ class MapTilePreview extends React.Component<Props, State> {
     previewCtx.lineTo(xe, ye);
     previewCtx.stroke();
   }
+
+  private handleExistingRaw = (existing: any) => {
+    const previewCtx = this.previewCtx!;
+    let initialised = false;
+    Object.keys(existing).forEach(i => {
+      Object.keys(existing[i]).forEach(j => {
+        const tmpImg = new Image();
+        tmpImg.src = existing[i][j];
+        tmpImg.onload = () => {
+          if (!initialised) {
+            initialised = true;
+            previewCtx.canvas.height =
+              tmpImg.height * Object.keys(existing[i]).length;
+            previewCtx.canvas.width =
+              tmpImg.width * Object.keys(existing).length;
+          }
+          // TODO: This isn't right
+          const details = {
+            h: tmpImg.height * (Number(j) + 1),
+            url: tmpImg.src,
+            w: tmpImg.width * (Number(i) + 1),
+            x: tmpImg.width * Number(i),
+            y: tmpImg.height * Number(j),
+          };
+          previewCtx.drawImage(
+            tmpImg,
+            details.x,
+            details.y,
+            details.w,
+            details.h,
+          );
+        };
+      });
+    });
+  };
 
   private getFileDetailsRaw = (): Promise<ImageDetails> =>
     new Promise(resolve => {
