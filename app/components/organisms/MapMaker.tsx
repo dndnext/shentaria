@@ -1,20 +1,22 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, FormEvent, MouseEvent } from "react";
 import { Marker } from "../../types";
 import MapTilePreview from "./MapTilePreview";
 
 interface Props {
   name?: string;
   existing?: any;
+  saveMarkers: (data: Array<Partial<Marker>>) => void;
 }
 
 interface State {
   file?: File;
+  tempMarker?: Partial<Marker>;
   markers: { [i: number]: Array<Partial<Marker>> };
-  z?: number;
+  z: number;
 }
 
 class MapMaker extends React.Component<Props, State> {
-  public state = {
+  public state: State = {
     file: undefined,
     markers: { 1: [] },
     z: 1,
@@ -22,13 +24,8 @@ class MapMaker extends React.Component<Props, State> {
 
   public render() {
     const { name = "Test", existing } = this.props;
-    const { file, markers = {}, z } = this.state;
+    const { file, tempMarker, markers, z } = this.state;
     const existingLayer = existing.layers && existing.layers[z];
-    const layerMarkers = (markers as any)[z] || [];
-    const lastMarker = [{ position: [0, 0] }].concat(layerMarkers).pop() || {
-      position: [0, 0],
-    };
-    const marker = lastMarker.position;
     return (
       <React.Fragment>
         <input type="file" onChange={this.handleFileChange} />
@@ -41,15 +38,47 @@ class MapMaker extends React.Component<Props, State> {
           onChange={this.handleChange}
           value={z}
         />
-        <div
-          style={{
-            left: marker[0],
-            position: "absolute",
-            top: marker[1] + 150,
-          }}
-        >
-          Marker
-        </div>
+        {tempMarker && tempMarker.position ? (
+          <div
+            style={{
+              left: tempMarker.position[0],
+              position: "absolute",
+              top: tempMarker.position[1] + 150,
+            }}
+          >
+            <form onSubmit={this.handleSubmitMarker(tempMarker.position)}>
+              <input
+                autoFocus
+                name="text"
+                defaultValue={tempMarker.text}
+                type="text"
+              />
+              <button
+                type="submit"
+                onClick={this.handleSubmitMarker(tempMarker.position)}
+              >
+                Add Marker
+              </button>
+            </form>
+          </div>
+        ) : null}
+        {markers[z] &&
+          markers[z].map(
+            marker =>
+              marker.position ? (
+                <div
+                  key={JSON.stringify(marker.position)}
+                  style={{
+                    left: marker.position[0],
+                    position: "absolute",
+                    top: marker.position[1] + 150,
+                  }}
+                  onClick={this.handleEditMarker(marker)}
+                >
+                  {marker.text}
+                </div>
+              ) : null,
+          )}
         <MapTilePreview
           download
           file={file}
@@ -63,13 +92,40 @@ class MapMaker extends React.Component<Props, State> {
     );
   }
 
-  private handleClick = (x: number, y: number, t: HTMLCanvasElement) => {
+  private handleClick = (x: number, y: number) => {
+    this.setState({ tempMarker: { position: [x, y] } });
+  };
+
+  private handleEditMarker = (marker: Partial<Marker>) => () => {
+    const { z } = this.state;
+    const p = marker.position!;
+    const newLayerMarkers = this.state.markers[this.state.z].filter(
+      ({ position = [] }) => position[0] !== p[0] || position[1] !== p[1],
+    );
+    const newMarkers = Object.assign({}, this.state.markers, {
+      [z]: newLayerMarkers,
+    }); //tslint:disable-line
+    this.setState({ tempMarker: marker, markers: newMarkers });
+  };
+
+  private handleSubmitMarker = ([x, y]: number[]) => (
+    e: MouseEvent<HTMLButtonElement> | FormEvent,
+  ) => {
+    e.preventDefault();
+    const inputs = [
+      ...(e.target as any).parentElement.querySelectorAll("input"),
+    ];
+    const content = inputs.reduce((v: any, el: HTMLInputElement) => {
+      return Object.assign({}, v, { [el.name]: el.value }); //tslint:disable-line
+    }, {});
     const { markers, z } = this.state;
+    const newMarker = { position: [x, y], text: content.text };
     const newMarkers = {
       ...markers,
-      [z]: [...((markers as any)[z] || []), { position: [x, y] }],
+      [z]: [...((markers as any)[z] || []), newMarker],
     };
-    this.setState({ markers: newMarkers });
+    this.props.saveMarkers(newMarkers as any);
+    this.setState({ markers: newMarkers, tempMarker: undefined });
   };
 
   private handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
