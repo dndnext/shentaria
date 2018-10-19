@@ -120,7 +120,7 @@ export default class extends React.Component<Props, State> {
           <Map
             center={[51.505, -0.09]}
             zoom={1}
-            style={{ height: "100vh" }}
+            style={{ height: "95vh" }}
             minZoom={1}
             maxZoom={5}
             onViewportChanged={this.onChange}
