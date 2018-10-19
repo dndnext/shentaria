@@ -20,6 +20,12 @@ router.get("/:id/full", async (req, res) => {
   res.send({ tiles: info[0], map: info[1] });
 });
 
+router.post("/:id/markers", async (req, res) => {
+  // TODO: Save and return markers
+  console.info(req.body);
+  res.send({ ok: 1 });
+});
+
 const getTileInfo = id =>
   new Promise((resolve, reject) => {
     const w = walk(__dirname + "/../../../static/tiles/" + id);
