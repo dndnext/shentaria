@@ -2,6 +2,7 @@ import Head from "next/head";
 import { RouterProps } from "next/router";
 import React from "react";
 import NoSSR from "react-no-ssr";
+import { Map as MapType, Marker as MarkerType } from "../../types";
 
 declare module "react" {
   interface StyleHTMLAttributes<T> {
@@ -10,35 +11,29 @@ declare module "react" {
   }
 }
 
-const tempmarkers = [
-  {
-    icon: "default",
-    position: [37, 17.09],
-    text: "Orsham. Totally not Horsham.",
-    visible: [2, 3, 4],
-  },
-  {
-    icon: "default",
-    position: [45, 100.09],
-    text: "Musta. Is it far?",
-    visible: [2, 3, 4],
-  },
-  { icon: "default", position: [5, 50.09], text: "Pearkl", visible: [3, 4] },
-];
-
-interface MarkerInfo {
-  icon: string;
-  position: number[];
-  text: string;
-  visible: number[];
-}
+// const tempmarkers = [
+//   {
+//     icon: "default",
+//     position: [37, 17.09],
+//     text: "Orsham. Totally not Horsham.",
+//     visible: [2, 3, 4],
+//   },
+//   {
+//     icon: "default",
+//     position: [45, 100.09],
+//     text: "Musta. Is it far?",
+//     visible: [2, 3, 4],
+//   },
+//   { icon: "default", position: [5, 50.09], text: "Pearkl", visible: [3, 4] },
+// ];
 
 interface Props {
   router: RouterProps;
+  map: MapType;
 }
 
 interface State {
-  markers?: MarkerInfo[];
+  markers: MarkerType[];
   render: boolean;
   z: number;
 }
@@ -71,21 +66,12 @@ export default class extends React.Component<Props, State> {
     });
   }
 
-  public componentDidUpdate(_: {}, { z: oldZ }: State) {
-    const { z } = this.state;
-    if (z !== oldZ) {
-      this.setState({
-        markers: tempmarkers.filter(({ visible }) => visible.includes(z)),
-      });
-    }
-  }
-
   public render() {
     const name =
       this.props.router && this.props.router.query
         ? (this.props.router.query.id as string)
         : "Test";
-    const { render, markers } = this.state;
+    const { render } = this.state;
     let Map, TileLayer, Marker: any, Popup: any;
     if (render) {
       const {
@@ -98,6 +84,11 @@ export default class extends React.Component<Props, State> {
       TileLayer = tilelayer;
       Marker = marker;
       Popup = popup;
+      // if (this.props.map && this.props.map.markers && this.L) {
+      //   console.info(this.L.CRS);
+      //   const t = this.L.CRS.pointToLatLng(this.props.map.markers[0].position, this.state.z);
+      //   console.info(t);
+      // }
     }
 
     return render ? (
@@ -124,13 +115,17 @@ export default class extends React.Component<Props, State> {
             minZoom={1}
             maxZoom={5}
             onViewportChanged={this.onChange}
+            whenReady={this.onReady}
           >
             <TileLayer url={`/static/tiles/${name}/{z}/{x}/{y}.png`} noWrap />
-            {markers.map(({ icon, position, text }: MarkerInfo, i) => (
-              <Marker key={i} position={position} icon={this.icons[icon]}>
-                <Popup>{text}</Popup>
-              </Marker>
-            ))}
+            {this.state.markers &&
+              this.state.markers.map(
+                ({ icon = "default", position, text }: MarkerType, i) => (
+                  <Marker key={i} position={position} icon={this.icons[icon]}>
+                    <Popup>{text}</Popup>
+                  </Marker>
+                ),
+              )}
           </Map>
         </NoSSR>
       </div>
@@ -138,6 +133,16 @@ export default class extends React.Component<Props, State> {
       <span>Map Placeholder</span>
     );
   }
+
+  private onReady = (a: any) => {
+    const markers = this.props.map.markers.map(marker => {
+      const point = new this.L.Point(...marker.position);
+      console.info(point);
+      const ll = a.target.options.crs.pointToLatLng(point, this.state.z);
+      return { ...marker, position: [ll.lat, ll.lng] };
+    });
+    this.setState({ markers });
+  };
 
   private onChange = ({ zoom: z }: ViewportChange) => {
     this.setState({ z });
