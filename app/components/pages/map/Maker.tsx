@@ -23,7 +23,7 @@ const Maker = ({ icons, router, map, postMarkers }: Props) => {
         <div>{Object.keys(map.value.tiles.layers).length} layers</div>
         <div>{icons.value.length} icons</div>
         <MapMaker
-          existing={map.value.tiles}
+          existing={map.value}
           name={getMapId(router)}
           saveMarkers={postMarkers}
         />
