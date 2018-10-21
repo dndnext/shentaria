@@ -11,21 +11,29 @@ interface Props {
 interface State {
   file?: File;
   tempMarker?: Partial<Marker>;
-  markers: { [i: number]: Array<Partial<Marker>> };
+  markers: Array<Partial<Marker>>;
   z: number;
 }
 
 class MapMaker extends React.Component<Props, State> {
   public state: State = {
     file: undefined,
-    markers: { 1: [] },
+    markers:
+      (this.props.existing &&
+        this.props.existing.map &&
+        this.props.existing.map.markers) ||
+      [],
     z: 1,
   };
 
   public render() {
     const { name = "Test", existing } = this.props;
     const { file, tempMarker, markers, z } = this.state;
-    const existingLayer = existing.layers && existing.layers[z];
+    const existingLayer =
+      existing &&
+      existing.tiles &&
+      existing.tiles.layers &&
+      existing.tiles.layers[z];
     return (
       <React.Fragment>
         <input type="file" onChange={this.handleFileChange} />
@@ -62,23 +70,25 @@ class MapMaker extends React.Component<Props, State> {
             </form>
           </div>
         ) : null}
-        {markers[z] &&
-          markers[z].map(
-            marker =>
-              marker.position ? (
-                <div
-                  key={JSON.stringify(marker.position)}
-                  style={{
-                    left: marker.position[0],
-                    position: "absolute",
-                    top: marker.position[1] + 150,
-                  }}
-                  onClick={this.handleEditMarker(marker)}
-                >
-                  {marker.text}
-                </div>
-              ) : null,
-          )}
+        {markers &&
+          markers
+            .filter(({ visibleLayers = [] }) => visibleLayers.includes(z))
+            .map(
+              marker =>
+                marker.position ? (
+                  <div
+                    key={JSON.stringify(marker.position)}
+                    style={{
+                      left: marker.position[0],
+                      position: "absolute",
+                      top: marker.position[1] + 150,
+                    }}
+                    onClick={this.handleEditMarker(marker)}
+                  >
+                    {marker.text}
+                  </div>
+                ) : null,
+            )}
         <MapTilePreview
           download
           file={file}
@@ -99,13 +109,12 @@ class MapMaker extends React.Component<Props, State> {
   private handleEditMarker = (marker: Partial<Marker>) => () => {
     const { z } = this.state;
     const p = marker.position!;
-    const newLayerMarkers = this.state.markers[this.state.z].filter(
-      ({ position = [] }) => position[0] !== p[0] || position[1] !== p[1],
+    const newLayerMarkers = this.state.markers.filter(
+      ({ position = [], visibleLayers = [] }) =>
+        (visibleLayers.includes(z) && position[0] !== p[0]) ||
+        position[1] !== p[1],
     );
-    const newMarkers = Object.assign({}, this.state.markers, {
-      [z]: newLayerMarkers,
-    }); //tslint:disable-line
-    this.setState({ tempMarker: marker, markers: newMarkers });
+    this.setState({ tempMarker: marker, markers: newLayerMarkers });
   };
 
   private handleSubmitMarker = ([x, y]: number[]) => (
@@ -119,11 +128,12 @@ class MapMaker extends React.Component<Props, State> {
       return Object.assign({}, v, { [el.name]: el.value }); //tslint:disable-line
     }, {});
     const { markers, z } = this.state;
-    const newMarker = { position: [x, y], text: content.text };
-    const newMarkers = {
-      ...markers,
-      [z]: [...((markers as any)[z] || []), newMarker],
+    const newMarker = {
+      position: [x, y],
+      text: content.text,
+      visibleLayers: [z],
     };
+    const newMarkers = [...markers, newMarker];
     this.props.saveMarkers(newMarkers as any);
     this.setState({ markers: newMarkers, tempMarker: undefined });
   };

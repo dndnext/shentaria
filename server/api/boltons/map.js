@@ -21,9 +21,13 @@ router.get("/:id/full", async (req, res) => {
 });
 
 router.post("/:id/markers", async (req, res) => {
-  // TODO: Save and return markers
-  console.info(req.body);
-  res.send({ ok: 1 });
+  const { id } = req.params;
+  const result = await Model.findOneAndUpdate(
+    { _id: id },
+    { $set: { markers: req.body } },
+    { new: true },
+  );
+  res.send(result);
 });
 
 const getTileInfo = id =>
