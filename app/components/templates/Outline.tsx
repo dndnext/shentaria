@@ -18,7 +18,6 @@ const styles = createStyles({
 
 const links = [
   { label: "Home", href: "/" },
-  { label: "Account", href: "/account" },
   { label: "Encyclopedia", href: "/encyclopedia" },
   { label: "Campaigns", href: "/campaign" },
   { label: "Map Editor", href: "/map/maker" },
