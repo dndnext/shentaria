@@ -39,6 +39,13 @@ nextApp
 
         handleWithParam(app, "get", handler, "/map/:id/editor", "/map/editor");
         handleWithParam(app, "get", handler, "/map/:id", "/map/view");
+        handleWithParam(
+          app,
+          "get",
+          handler,
+          "/campaign/:id/edit",
+          "/campaign/edit",
+        );
         handleWithParam(app, "get", handler, "/campaign/:id", "/campaign/view");
         handleWithParam(
           app,
