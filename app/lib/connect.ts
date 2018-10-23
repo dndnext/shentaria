@@ -1,6 +1,6 @@
 import fetch from "isomorphic-fetch";
 // @ts-ignore
-import { connect } from "react-refetch";
+import { connect, PromiseState } from "react-refetch";
 // @ts-ignore
 
 export default connect.defaults({
@@ -14,3 +14,5 @@ export default connect.defaults({
     },
   },
 });
+
+export const ConnectState = PromiseState;

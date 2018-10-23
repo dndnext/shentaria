@@ -51,6 +51,13 @@ nextApp
           app,
           "get",
           handler,
+          "/encyclopedia/entry/:id/edit",
+          "/encyclopedia/edit/entry",
+        );
+        handleWithParam(
+          app,
+          "get",
+          handler,
           "/encyclopedia/entry/:id",
           "/encyclopedia/view/entry",
         );
@@ -60,6 +67,13 @@ nextApp
           handler,
           "/encyclopedia/:id/new",
           "/new/encyclopedia/entry",
+        );
+        handleWithParam(
+          app,
+          "get",
+          handler,
+          "/encyclopedia/:id/edit",
+          "/encyclopedia/edit",
         );
         handleWithParam(
           app,
