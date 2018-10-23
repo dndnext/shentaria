@@ -1,6 +1,7 @@
 import { RouterProps } from "next/router";
 import React from "react";
 import connect from "../../../lib/connect";
+import parseContent from "../../../lib/parseContent";
 import { EncyclopediaEntry, PromiseState } from "../../../types";
 
 interface Props {
@@ -10,10 +11,11 @@ interface Props {
 
 const ViewEncyclopediaEntry = ({ entry }: Props) => {
   if (entry.fulfilled) {
+    const content = parseContent(entry.value.content);
     return (
       <div>
         <h4>{entry.value.name}</h4>
-        <p>{entry.value.content}</p>
+        <div dangerouslySetInnerHTML={{ __html: content }} />
         <a href={`/encyclopedia/${entry.value.encyclopedia}`}>
           Back to Encyclopedia
         </a>

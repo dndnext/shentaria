@@ -1,55 +1,33 @@
 import { RouterProps } from "next/router";
-import React, { ChangeEvent, FormEvent } from "react";
+import React from "react";
 import connect from "../../../lib/connect";
 import { Map } from "../../../types";
+import MapForm, { State as FormState } from "../../organisms/MapForm";
 
 interface Props {
-  post: (d: Partial<Map>) => Promise<Map>;
+  postMap: (d: Partial<Map>) => Promise<Map>;
   router: RouterProps;
 }
 
-class NewMap extends React.Component<Props> {
-  public state = {
-    description: "",
-    name: "",
-  };
-
+class NewCampaign extends React.Component<Props> {
   public render() {
-    const { name, description } = this.state;
-    return (
-      <form onSubmit={this.submit}>
-        <input type="text" name="name" onChange={this.onChange} value={name} />
-        <textarea
-          name="description"
-          onChange={this.onChange}
-          value={description}
-        />
-        <input type="submit" onClick={this.submit} />
-      </form>
-    );
+    return <MapForm map={{}} onSubmit={this.submit} />;
   }
 
-  private onChange = ({
-    target,
-  }: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({ [target.name]: target.value });
-  };
-
-  private submit = async (e: MouseEvent | FormEvent) => {
-    e.preventDefault();
-    this.props.post(this.state);
+  private submit = (state: FormState) => {
+    this.props.postMap(state);
   };
 }
 
 export default connect((props: Props) => ({
-  post: (data: Partial<Map>) => ({
-    map: {
+  postMap: (data: Partial<Map>) => ({
+    encyclopedia: {
       body: JSON.stringify(data),
       method: "POST",
-      then: (map: Map) => {
-        props.router.push(`/map/${map._id}/editor`);
+      then: ({ _id }: Map) => {
+        props.router.push(`/map/${_id}/editor`);
       },
       url: "/api/map",
     },
   }),
-}))(NewMap);
+}))(NewCampaign);
