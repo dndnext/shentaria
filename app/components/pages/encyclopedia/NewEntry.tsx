@@ -1,7 +1,32 @@
 import { RouterProps } from "next/router";
-import React, { ChangeEvent, FormEvent } from "react";
+import React from "react";
+import { Value } from "slate";
 import connect from "../../../lib/connect";
 import { Encyclopedia, EncyclopediaEntry, PromiseState } from "../../../types";
+import Form, {
+  State as FormState,
+} from "../../organisms/EncyclopediaEntryForm";
+
+const initialValue = Value.fromJSON({
+  document: {
+    nodes: [
+      {
+        nodes: [
+          {
+            leaves: [
+              {
+                text: "A line of text in a paragraph.",
+              },
+            ],
+            object: "text",
+          },
+        ],
+        object: "block",
+        type: "paragraph",
+      },
+    ],
+  },
+});
 
 interface Props {
   encyclopedia: PromiseState<Encyclopedia>;
@@ -11,32 +36,15 @@ interface Props {
 
 class NewEncyclopediaEntry extends React.Component<Props> {
   public state = {
-    content: "",
+    content: initialValue,
     name: "",
   };
 
   public render() {
-    const { name, content } = this.state;
     const { encyclopedia } = this.props;
     if (encyclopedia.fulfilled) {
       const loaded = encyclopedia.value;
-      return (
-        <div>
-          <h4>{loaded.name}</h4>
-          <p>{loaded.description}</p>
-          <a href={`/encyclopedia/${loaded._id}`}>Back to encyclopedia</a>
-          <form onSubmit={this.submit}>
-            <input
-              type="text"
-              name="name"
-              onChange={this.onChange}
-              value={name}
-            />
-            <textarea name="content" onChange={this.onChange} value={content} />
-            <input type="submit" onClick={this.submit} />
-          </form>
-        </div>
-      );
+      return <Form entry={{}} encyclopedia={loaded} onSubmit={this.onSubmit} />;
     } else if (encyclopedia.pending) {
       return <div>Loading</div>;
     } else {
@@ -44,16 +52,11 @@ class NewEncyclopediaEntry extends React.Component<Props> {
     }
   }
 
-  private onChange = ({
-    target,
-  }: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({ [target.name]: target.value });
-  };
-
-  private submit = async (e: MouseEvent | FormEvent) => {
-    e.preventDefault();
+  private onSubmit = (state: FormState) => {
+    console.info("saving", state);
     const data = {
-      ...this.state,
+      ...state,
+      content: JSON.stringify(state.value.toJSON()),
       encyclopedia: this.props.encyclopedia.value._id,
     };
     this.props.postEntry(data);

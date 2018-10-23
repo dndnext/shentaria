@@ -22,7 +22,7 @@ const ListEncyclopedia = ({ encyclopedias, classes }: Props) => {
   if (encyclopedias.fulfilled) {
     return (
       <React.Fragment>
-        <a href="/new/map">
+        <a href="/new/encyclopedia">
           <AddButton />
         </a>
         <Grid container>

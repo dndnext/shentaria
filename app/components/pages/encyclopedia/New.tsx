@@ -1,7 +1,10 @@
 import { RouterProps } from "next/router";
-import React, { ChangeEvent, FormEvent } from "react";
+import React from "react";
 import connect from "../../../lib/connect";
 import { Encyclopedia } from "../../../types";
+import EncyclopediaForm, {
+  State as FormState,
+} from "../../organisms/EncyclopediaForm";
 
 interface Props {
   postEncyclopedia: (d: Partial<Encyclopedia>) => Promise<Encyclopedia>;
@@ -9,35 +12,13 @@ interface Props {
 }
 
 class NewEncyclopedia extends React.Component<Props> {
-  public state = {
-    description: "",
-    name: "",
-  };
-
   public render() {
-    const { name, description } = this.state;
-    return (
-      <form onSubmit={this.submit}>
-        <input type="text" name="name" onChange={this.onChange} value={name} />
-        <textarea
-          name="description"
-          onChange={this.onChange}
-          value={description}
-        />
-        <input type="submit" onClick={this.submit} />
-      </form>
-    );
+    return <EncyclopediaForm encyclopedia={{}} onSubmit={this.submit} />;
   }
 
-  private onChange = ({
-    target,
-  }: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({ [target.name]: target.value });
-  };
-
-  private submit = async (e: MouseEvent | FormEvent) => {
-    e.preventDefault();
-    this.props.postEncyclopedia(this.state);
+  private submit = (state: FormState) => {
+    console.info("submitting", state);
+    this.props.postEncyclopedia(state);
   };
 }
 

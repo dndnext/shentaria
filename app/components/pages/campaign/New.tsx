@@ -1,53 +1,31 @@
 import { RouterProps } from "next/router";
-import React, { ChangeEvent, FormEvent } from "react";
+import React from "react";
 import connect from "../../../lib/connect";
 import { Campaign } from "../../../types";
+import CampaignForm, { State as FormState } from "../../organisms/CampaignForm";
 
 interface Props {
-  post: (d: Partial<Campaign>) => Promise<Campaign>;
+  postCampaign: (d: Partial<Campaign>) => Promise<Campaign>;
   router: RouterProps;
 }
 
 class NewCampaign extends React.Component<Props> {
-  public state = {
-    description: "",
-    name: "",
-  };
-
   public render() {
-    const { name, description } = this.state;
-    return (
-      <form onSubmit={this.submit}>
-        <input type="text" name="name" onChange={this.onChange} value={name} />
-        <textarea
-          name="description"
-          onChange={this.onChange}
-          value={description}
-        />
-        <input type="submit" onClick={this.submit} />
-      </form>
-    );
+    return <CampaignForm campaign={{}} onSubmit={this.submit} />;
   }
 
-  private onChange = ({
-    target,
-  }: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({ [target.name]: target.value });
-  };
-
-  private submit = async (e: MouseEvent | FormEvent) => {
-    e.preventDefault();
-    this.props.post(this.state);
+  private submit = (state: FormState) => {
+    this.props.postCampaign(state);
   };
 }
 
 export default connect((props: Props) => ({
-  post: (data: Partial<Campaign>) => ({
+  postCampaign: (data: Partial<Campaign>) => ({
     encyclopedia: {
       body: JSON.stringify(data),
       method: "POST",
-      then: (campaign: Campaign) => {
-        props.router.push(`/campaign/${campaign._id}`);
+      then: ({ _id }: Campaign) => {
+        props.router.push(`/campaign/${_id}`);
       },
       url: "/api/campaign",
     },
