@@ -8,7 +8,7 @@ const AuthMenu: React.SFC = () => (
       console.info("session", session);
       return (
         <div>
-          {(session && session.user && session.user.name) || (
+          {(session && session.user && session.user.email) || (
             <Link href="/auth">
               <a>Login</a>
             </Link>
