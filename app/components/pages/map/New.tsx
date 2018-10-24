@@ -21,7 +21,7 @@ class NewCampaign extends React.Component<Props> {
 
 export default connect((props: Props) => ({
   postMap: (data: Partial<Map>) => ({
-    encyclopedia: {
+    map: {
       body: JSON.stringify(data),
       method: "POST",
       then: ({ _id }: Map) => {

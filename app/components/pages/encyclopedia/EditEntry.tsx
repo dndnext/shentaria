@@ -21,8 +21,11 @@ class NewEncyclopediaEntry extends React.Component<Props> {
 
   public render() {
     const { encyclopedia, entry } = this.props;
+    console.info(encyclopedia);
     const data = ConnectState.all([entry, encyclopedia].filter(i => i));
-    if (data.fulfilled) {
+    if (data.pending) {
+      return <div>Loading</div>;
+    } else if (data.fulfilled) {
       const [entryData, encyclopediaData] = data.value;
       return (
         <Form
@@ -31,8 +34,6 @@ class NewEncyclopediaEntry extends React.Component<Props> {
           onSubmit={this.onSubmit}
         />
       );
-    } else if (data.pending) {
-      return <div>Loading</div>;
     } else {
       return <div>Error</div>;
     }
@@ -58,7 +59,7 @@ export default connect((props: Props) => ({
       props.router.query.id}`,
   },
   putEntry: (data: Partial<EncyclopediaEntry>) => ({
-    encyclopedia: {
+    entry: {
       body: JSON.stringify(data),
       method: "PUT",
       then: (entry: EncyclopediaEntry) => {

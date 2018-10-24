@@ -32,7 +32,7 @@ export default connect((props: Props) => ({
     props.router.query &&
     props.router.query.id}`,
   putCampaign: (data: Partial<Campaign>) => ({
-    encyclopedia: {
+    campaign: {
       body: JSON.stringify(data),
       method: "PUT",
       then: ({ _id }: Campaign) => {

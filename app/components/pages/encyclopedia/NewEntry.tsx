@@ -45,7 +45,7 @@ export default connect((props: Props) => ({
     props.router.query &&
     props.router.query.id}`,
   postEntry: (data: Partial<EncyclopediaEntry>) => ({
-    encyclopedia: {
+    entry: {
       body: JSON.stringify(data),
       method: "POST",
       then: (entry: EncyclopediaEntry) => {
