@@ -2,6 +2,7 @@ import { RouterProps } from "next/router";
 import React from "react";
 import connect from "../../../lib/connect";
 import { Campaign, PromiseState } from "../../../types";
+import CampaignCard from "../../molecules/CampaignCard";
 
 interface Props {
   campaign: PromiseState<Campaign>;
@@ -12,8 +13,7 @@ const ViewCampaign = ({ campaign }: Props) => {
   if (campaign.fulfilled) {
     return (
       <div>
-        <h4>{campaign.value.name}</h4>
-        <p>{campaign.value.description}</p>
+        <CampaignCard {...campaign.value} />
       </div>
     );
   } else if (campaign.pending) {

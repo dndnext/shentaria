@@ -4,6 +4,7 @@ import React from "react";
 import connect from "../../../lib/connect";
 import { Encyclopedia, EncyclopediaEntry, PromiseState } from "../../../types";
 import AddButton from "../../atoms/NewButton";
+import EncyclopediaCard from "../../molecules/EncyclopediaCard";
 import EncyclopediaEntryCard from "../../molecules/EncyclopediaEntryCard";
 
 interface Props {
@@ -22,8 +23,7 @@ class ViewEncyclopedia extends React.Component<Props> {
           encyclopedia.pending,
           () => (
             <React.Fragment>
-              <h4>{encyclopedia.value.name}</h4>
-              <p>{encyclopedia.value.description}</p>
+              <EncyclopediaCard {...encyclopedia.value} />
             </React.Fragment>
           ),
         )}
