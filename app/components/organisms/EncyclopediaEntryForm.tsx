@@ -5,13 +5,11 @@ import Paper from "@material-ui/core/Paper";
 import { createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import React, { ChangeEvent, FormEvent, MouseEvent } from "react";
-import { Change, Value } from "slate";
-import { Editor } from "slate-react";
 import { Encyclopedia, EncyclopediaEntry } from "../../types";
 
 export interface State {
   name: string;
-  value: Value;
+  content: string;
 }
 
 interface Props {
@@ -31,41 +29,15 @@ const styles = createStyles(({ spacing }: Theme) => ({
   },
 }));
 
-const defaultValue = {
-  document: {
-    nodes: [
-      {
-        nodes: [
-          {
-            leaves: [
-              {
-                text: "Description.",
-              },
-            ],
-            object: "text",
-          },
-        ],
-        object: "block",
-        type: "paragraph",
-      },
-    ],
-  },
-};
-
 class EncyclopediaEntryForm extends React.Component<Props> {
   public state = {
+    content: this.props.entry.content || "",
     name: this.props.entry.name || "",
-    value: Value.fromJSON(
-      JSON.parse(
-        (this.props.entry && this.props.entry.content) ||
-          JSON.stringify(defaultValue),
-      ),
-    ),
   };
 
   public render() {
     const { classes, encyclopedia } = this.props;
-    const { name, value } = this.state;
+    const { name, content } = this.state;
     return (
       <form onSubmit={this.onSubmit}>
         <Grid container justify="center" spacing={8} className={classes.root}>
@@ -92,10 +64,13 @@ class EncyclopediaEntryForm extends React.Component<Props> {
                 name="name"
                 onChange={this.handleChange}
               />
-              <Editor
-                value={value}
-                onChange={this.handleEditorChange}
-                className={classes.paper}
+              <Input
+                placeholder="content"
+                type="text"
+                fullWidth
+                value={content}
+                name="content"
+                onChange={this.handleChange}
               />
             </Paper>
           </Grid>
@@ -122,14 +97,6 @@ class EncyclopediaEntryForm extends React.Component<Props> {
     target,
   }: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     this.setState({ [target.name]: target.value }, () => {
-      if (this.props.onChange) {
-        this.props.onChange(this.state);
-      }
-    });
-  };
-
-  private handleEditorChange = ({ value }: Change) => {
-    this.setState({ value }, () => {
       if (this.props.onChange) {
         this.props.onChange(this.state);
       }

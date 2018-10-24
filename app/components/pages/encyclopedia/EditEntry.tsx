@@ -1,32 +1,10 @@
 import { RouterProps } from "next/router";
 import React from "react";
-import { Value } from "slate";
 import connect, { ConnectState } from "../../../lib/connect";
 import { Encyclopedia, EncyclopediaEntry, PromiseState } from "../../../types";
 import Form, {
   State as FormState,
 } from "../../organisms/EncyclopediaEntryForm";
-
-const initialValue = Value.fromJSON({
-  document: {
-    nodes: [
-      {
-        nodes: [
-          {
-            leaves: [
-              {
-                text: "A line of text in a paragraph.",
-              },
-            ],
-            object: "text",
-          },
-        ],
-        object: "block",
-        type: "paragraph",
-      },
-    ],
-  },
-});
 
 interface Props {
   encyclopedia: PromiseState<Encyclopedia>;
@@ -37,7 +15,7 @@ interface Props {
 
 class NewEncyclopediaEntry extends React.Component<Props> {
   public state = {
-    content: initialValue,
+    content: "",
     name: "",
   };
 
@@ -64,7 +42,6 @@ class NewEncyclopediaEntry extends React.Component<Props> {
     console.info("saving", state);
     const data = {
       ...state,
-      content: JSON.stringify(state.value.toJSON()),
       encyclopedia: this.props.encyclopedia.value._id,
     };
     this.props.putEntry(data);
