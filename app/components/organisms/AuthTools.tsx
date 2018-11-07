@@ -1,19 +1,19 @@
 import Avatar from "@material-ui/core/Avatar";
 import deepOrange from "@material-ui/core/colors/deepOrange";
-import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
 import Link from "next/link";
 import React from "react";
 import { UserConsumer } from "../contexts/user";
 
 const styles = {
   item: {
-    cursor: "pointer",
-    marginRight: 15,
     "&:hover": {
       color: "#C0FFEE",
       opacity: 1,
     },
+    cursor: "pointer",
+    marginRight: 15,
   },
   orangeAvatar: {
     backgroundColor: deepOrange[500],

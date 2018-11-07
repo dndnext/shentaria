@@ -15,9 +15,9 @@ const hoverStyle = {
 
 const styles = createStyles({
   item: {
+    "&:hover": hoverStyle,
     cursor: "pointer",
     marginRight: 15,
-    "&:hover": hoverStyle,
   },
   root: {
     flexGrow: 1,
