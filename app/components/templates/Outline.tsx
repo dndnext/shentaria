@@ -1,5 +1,7 @@
 import AppBar from "@material-ui/core/AppBar";
 import { createStyles, withStyles } from "@material-ui/core/styles";
+import Tab from "@material-ui/core/Tab";
+import Tabs from "@material-ui/core/Tabs";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Link from "next/link";
@@ -36,13 +38,13 @@ const Outline: React.SFC<{ children: ReactChild; classes: any }> = ({
             Shentaria
           </Typography>
         </Link>
-        {links.map(({ label, href }) => (
-          <Link key={label} href={href}>
-            <Typography variant="h6" color="inherit" className={classes.item}>
-              {label}
-            </Typography>
-          </Link>
-        ))}
+        <Tabs value={false}>
+          {links.map(({ label, href }) => (
+            <Link key={label} href={href}>
+              <Tab label={label} selected={true} />
+            </Link>
+          ))}
+        </Tabs>
         <AuthTools />
       </Toolbar>
     </AppBar>

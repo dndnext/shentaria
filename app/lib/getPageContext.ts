@@ -1,5 +1,5 @@
-import green from "@material-ui/core/colors/green";
-import purple from "@material-ui/core/colors/purple";
+import cyan from "@material-ui/core/colors/cyan";
+import pink from "@material-ui/core/colors/pink";
 import {
   createGenerateClassName,
   createMuiTheme,
@@ -9,14 +9,14 @@ import { SheetsRegistry } from "jss";
 const theme = createMuiTheme({
   palette: {
     primary: {
-      dark: purple[700],
-      light: purple[300],
-      main: purple[500],
+      dark: pink[900],
+      light: pink[600],
+      main: pink[800],
     },
     secondary: {
-      dark: green[700],
-      light: green[300],
-      main: green[500],
+      dark: cyan[900],
+      light: cyan[600],
+      main: cyan[800],
     },
   },
   typography: {
