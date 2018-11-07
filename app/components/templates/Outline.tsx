@@ -8,13 +8,22 @@ import Link from "next/link";
 import React, { ReactChild } from "react";
 import AuthTools from "../organisms/AuthTools";
 
+const hoverStyle = {
+  color: "#C0FFEE",
+  opacity: 1,
+};
+
 const styles = createStyles({
   item: {
     cursor: "pointer",
     marginRight: 15,
+    "&:hover": hoverStyle,
   },
   root: {
     flexGrow: 1,
+  },
+  tabRoot: {
+    "&:hover": hoverStyle,
   },
 });
 
@@ -41,7 +50,7 @@ const Outline: React.SFC<{ children: ReactChild; classes: any }> = ({
         <Tabs value={false}>
           {links.map(({ label, href }) => (
             <Link key={label} href={href}>
-              <Tab label={label} selected={true} />
+              <Tab label={label} selected={true} className={classes.tabRoot} />
             </Link>
           ))}
         </Tabs>

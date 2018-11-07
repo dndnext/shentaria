@@ -1,20 +1,31 @@
 import Avatar from "@material-ui/core/Avatar";
 import deepOrange from "@material-ui/core/colors/deepOrange";
+import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
 import Link from "next/link";
 import React from "react";
 import { UserConsumer } from "../contexts/user";
 
 const styles = {
+  item: {
+    cursor: "pointer",
+    marginRight: 15,
+    "&:hover": {
+      color: "#C0FFEE",
+      opacity: 1,
+    },
+  },
   orangeAvatar: {
     backgroundColor: deepOrange[500],
     color: "#fff",
     margin: 10,
   },
   row: {
+    alignItems: "center",
     display: "flex",
     justifyContent: "center",
     marginLeft: "auto",
+    minHeight: 60,
   },
 };
 
@@ -31,7 +42,9 @@ const AuthMenu: React.SFC<{ classes: any }> = ({ classes }) => (
               </Avatar>
             )) || (
             <Link href="/auth">
-              <a>Login</a>
+              <Typography variant="h6" color="inherit" className={classes.item}>
+                Login
+              </Typography>
             </Link>
           )}
         </div>
