@@ -17,3 +17,4 @@ A google maps like mapping tool for dnd worlds.
 > Need ideas on how to slice input images into tiles. Though do we need tiles?
 - [ ] Find way of transitioning between layers on front end.
 - [ ] Nice way to add points of interest.
+- [ ] Move to now/github pages hosts site, with a GCP or hosted SQL backend to save costs/maintenance.
