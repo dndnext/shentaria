@@ -20,3 +20,4 @@ A google maps like mapping tool for dnd worlds.
   - To make this easier, probably would be best to allow downloading example tile image sets to make matching it up easier
 - [ ] Nice way to add points of interest.
 - [ ] Move to now/github pages hosts site, with a GCP or hosted SQL backend to save costs/maintenance.
+- [ ] For user avatars, can probably use a service like [DiceBear Avatars](https://avatars.dicebear.com/).
