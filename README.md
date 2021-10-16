@@ -17,5 +17,6 @@ A google maps like mapping tool for dnd worlds.
 > Need ideas on how to slice input images into tiles. Though do we need tiles?
 > Could probably use [React Leaflet](https://react-leaflet.js.org/).
 - [ ] Find way of transitioning between layers on front end.
+  - To make this easier, probably would be best to allow downloading example tile image sets to make matching it up easier
 - [ ] Nice way to add points of interest.
 - [ ] Move to now/github pages hosts site, with a GCP or hosted SQL backend to save costs/maintenance.
