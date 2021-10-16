@@ -18,6 +18,6 @@ A google maps like mapping tool for dnd worlds.
 > Could probably use [React Leaflet](https://react-leaflet.js.org/).
 - [ ] Find way of transitioning between layers on front end.
   - To make this easier, probably would be best to allow downloading example tile image sets to make matching it up easier
-- [ ] Nice way to add points of interest.
+- [ ] Nice way to add points of interest - need to have translation between coordinates on the map and on the page (with zoom and scroll)
 - [ ] Move to now/github pages hosts site, with a GCP or hosted SQL backend to save costs/maintenance.
 - [ ] For user avatars, can probably use a service like [DiceBear Avatars](https://avatars.dicebear.com/).
